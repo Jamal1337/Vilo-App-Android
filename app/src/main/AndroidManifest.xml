@@ -22,6 +22,8 @@
         </activity>
         <activity android:name=".Me" >
         </activity>
+        <activity android:name=".Quickpost" >
+        </activity>
     </application>
 
 </manifest>

@@ -30,7 +30,7 @@ import java.util.Date;
 // Referenced classes of package com.fslabs.demo:
 //            Post, Util, PosttypePicker, ImagePicker
 
-public class Quickpost extends Post
+public class Quickpost extends Activity
 {
 
     final int IMAGE_INTENT = 1;
@@ -42,6 +42,15 @@ public class Quickpost extends Post
     ImageView thumb;
     TextView txtImagePicker;
     View view;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.quickpost);
+
+        //toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+    }
 
     public Quickpost()
     {
@@ -113,7 +122,7 @@ _L3:*/
     {
         Intent intent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
         intent.setData(Uri.fromFile(new File(mCurrentPhotoPath)));
-        getActivity().sendBroadcast(intent);
+        //getActivity().sendBroadcast(intent);
     }
 
     private static int getPowerOfTwoForSampleRatio(double d)
@@ -140,7 +149,7 @@ _L3:*/
     public static Quickpost newInstance()
     {
         Quickpost quickpost = new Quickpost();
-        quickpost.setArguments(new Bundle());
+        //quickpost.setArguments(new Bundle());
         return quickpost;
     }
 

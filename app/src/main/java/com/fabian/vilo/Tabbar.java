@@ -1,5 +1,6 @@
 package com.fabian.vilo;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -40,13 +41,18 @@ public class Tabbar extends AppCompatActivity {
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 
-        /*FloatingActionButton uploadBtn = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton uploadBtn = (FloatingActionButton) findViewById(R.id.fab);
 
         uploadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Log.d(TAG, "btn pressed");
+
+
+                Intent i = new Intent(Tabbar.this, Quickpost.class);
+                startActivity(i);
+
                 /*FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
                 //fragmenttransaction.setCustomAnimations(0x7f040000, 0, 0, 0x7f040001);
                 fragmenttransaction.replace(R.layout.activity_around_me, Quickpost.newInstance(), "postFragment");
@@ -64,8 +70,8 @@ public class Tabbar extends AppCompatActivity {
 
                 dialog.show();*/
 
-            /*}
-        });*/
+            }
+        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Around Me"));

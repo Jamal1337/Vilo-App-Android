@@ -54,15 +54,6 @@ public class Me extends Fragment {
         txtPosts = (TextView) rootView.findViewById(R.id.txtPosts);
         txtPostsCount = (TextView) rootView.findViewById(R.id.txtPostsCount);
 
-        ListView myListView = (ListView) rootView.findViewById(R.id.listView);
-        ArrayList<String> myStringArray1 = new ArrayList<String>();
-        for (int l=0;l<5;l++) {
-            myStringArray1.add("something");
-        }
-
-        ListViewAdapter adapter = new ListViewAdapter(getActivity(), R.layout.me_interests, myStringArray1);
-        myListView.setAdapter(adapter);
-
         rootView.findViewById(R.id.showInterests).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,9 +80,21 @@ public class Me extends Fragment {
     }
 
     void displayInterests() {
-        frame.removeAllViews();
+        //frame.removeAllViews();
 
-        View view = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.me_interests, frame, false);// .getSystemService("layout_inflater")).inflate(0x7f030011, frame, false);
+        //View view = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.me_interests, frame, false);// .getSystemService("layout_inflater")).inflate(0x7f030011, frame, false);
+
+        ListView myListView = (ListView) rootView.findViewById(R.id.listView);
+        ListViewAdapter emptyAdapter = new ListViewAdapter(getActivity(), R.layout.me_interests, new ArrayList<String>());
+        myListView.setAdapter(emptyAdapter);
+        ArrayList<String> myStringArray1 = new ArrayList<String>();
+        for (int l=0;l<5;l++) {
+            myStringArray1.add("something");
+        }
+
+        ListViewAdapter adapter = new ListViewAdapter(getActivity(), R.layout.me_interests, myStringArray1);
+        myListView.setAdapter(adapter);
+
         //view.startAnimation(AnimationUtils.loadAnimation(getActivity(), 0x7f040002));
 
         //rootView.inflate(R.layout.me_interests, frame, false);
@@ -103,19 +106,31 @@ public class Me extends Fragment {
         //view.startAnimation(AnimationUtils.loadAnimation(getActivity(), 0x7f040002));
 
 
-        frame.addView(view);
+        //frame.addView(myListView);
         interestsSelected();
     }
 
     void displayOwnPosts() {
 
-        frame.removeAllViews();
+        /*frame.removeAllViews();
 
         View view = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.me_posts, frame, false);
         View view2 = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.me_posts, frame, false);
 
         frame.addView(view);
-        frame.addView(view2);
+        frame.addView(view2);*/
+
+        ListView myListView = (ListView) rootView.findViewById(R.id.listView);
+        ListViewAdapter emptyAdapter = new ListViewAdapter(getActivity(), R.layout.me_interests, new ArrayList<String>());
+        myListView.setAdapter(emptyAdapter);
+        ArrayList<String> myStringArray1 = new ArrayList<String>();
+        for (int l=0;l<3;l++) {
+            myStringArray1.add("something");
+        }
+
+        ListViewAdapter adapter = new ListViewAdapter(getActivity(), R.layout.me_interests, myStringArray1);
+        myListView.setAdapter(adapter);
+
         ownPostsSelected();
     }
 

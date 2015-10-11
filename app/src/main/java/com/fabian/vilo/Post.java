@@ -33,7 +33,7 @@ public class Post extends Fragment
                     Post.currentPostType = i;
                     if (i == 100)
                     {
-                        setPostType(Quickpost.newInstance());
+                        //setPostType(Quickpost.newInstance());
                         return;
                     }
                     if (i == 101)
