@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.daimajia.swipe.SwipeLayout android:layout_width="fill_parent" android:layout_height="120.0dip" android:layout_marginTop="3.0dip" android:layout_marginBottom="3.0dip"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:background="#ffffffff" android:layout_width="wrap_content" android:layout_height="fill_parent">
+        <TextView android:textSize="@dimen/swipe" android:gravity="center" android:id="@+id/share" android:background="@color/share" android:paddingLeft="15.0dip" android:paddingRight="15.0dip" android:layout_width="100.0dip" android:layout_height="fill_parent" android:text="Share" />
+        <TextView android:textSize="@dimen/swipe" android:gravity="center" android:id="@+id/report" android:background="@color/report" android:paddingLeft="15.0dip" android:paddingRight="15.0dip" android:layout_width="100.0dip" android:layout_height="fill_parent" android:text="Report" />
+        <TextView android:textSize="@dimen/swipe" android:gravity="center" android:id="@+id/trash" android:background="@color/delete" android:paddingLeft="15.0dip" android:paddingRight="15.0dip" android:layout_width="100.0dip" android:layout_height="fill_parent" android:text="Delete" />
+    </LinearLayout>
+    <LinearLayout android:background="#ffffffff" android:layout_width="fill_parent" android:layout_height="fill_parent">
+        <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+            <LinearLayout android:gravity="center" android:orientation="vertical" android:id="@+id/swipeMeta" android:layout_width="wrap_content" android:layout_height="fill_parent" android:layout_marginLeft="5.0dip" android:layout_marginRight="5.0dip" android:layout_alignParentRight="true">>
+                <ImageView android:layout_width="25.0dip" android:layout_height="25.0dip" android:src="@drawable/likes" />
+                <TextView android:textSize="@dimen/cardmeata" android:textColor="@color/cardmeta" android:id="@+id/cardLikes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="5.0dip" android:layout_marginBottom="5.0dip" android:text="0" />
+                <ImageView android:layout_width="25.0dip" android:layout_height="25.0dip" android:layout_marginTop="5.0dip" android:layout_marginBottom="5.0dip" android:src="@drawable/comments" />
+                <TextView android:textSize="@dimen/cardmeata" android:textColor="@color/cardmeta" android:id="@+id/cardComments" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_toLeftOf="@id/swipeMeta">
+                <LinearLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="0.4">
+                    <ImageView android:layout_width="fill_parent" android:layout_height="fill_parent" android:src="@drawable/hafen" android:scaleType="centerCrop" />
+                </LinearLayout>
+                <LinearLayout android:paddingLeft="10.0dip" android:paddingTop="10.0dip" android:paddingRight="10.0dip" android:paddingBottom="3.0dip" android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="0.6">
+                    <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent">
+                        <TextView android:textSize="@dimen/cardtitle" android:textColor="@color/cardmain" android:id="@+id/swipeTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="10.0dip" android:layout_marginBottom="10.0dip" android:text="Hafenrundfahrt" android:singleLine="true" />
+                        <TextView android:textSize="@dimen/cardmain" android:textColor="@color/cardmain" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="10.0dip" android:text="Heute ist es mal wieder so weit. Wir fahren nach Hause!" android:singleLine="true" android:layout_below="@id/swipeTitle" />
+                        <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+                            <ImageView android:id="@+id/swipeClock" android:layout_width="25.0dip" android:layout_height="25.0dip" android:layout_marginRight="5.0dip" android:src="@drawable/clock_grey" />
+                            <TextView android:textSize="@dimen/cardmeata" android:textColor="@color/cardmeta" android:id="@+id/swipeClockText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5h" android:layout_toRightOf="@id/swipeClock" android:layout_centerVertical="true" />
+                            <TextView android:textSize="@dimen/cardmeata" android:textColor="@color/cardmeta" android:id="@+id/swipeLocationText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4km" android:layout_alignParentRight="true" android:layout_centerVertical="true" />
+                            <ImageView android:layout_width="25.0dip" android:layout_height="25.0dip" android:layout_marginRight="5.0dip" android:src="@drawable/distance_grey" android:layout_toLeftOf="@id/swipeLocationText" />
+                        </RelativeLayout>
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</com.daimajia.swipe.SwipeLayout>
