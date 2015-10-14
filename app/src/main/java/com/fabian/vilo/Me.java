@@ -1,17 +1,28 @@
 package com.fabian.vilo;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import android.view.animation.AnimationUtils;
@@ -20,6 +31,15 @@ import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import java.util.ArrayList;
 import android.widget.ListView;
+
+import com.fabian.vilo.models.CDModels.CDUser;
+import com.fabian.vilo.models.CDModels.ModelManager;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 public class Me extends Fragment {
 
@@ -34,6 +54,10 @@ public class Me extends Fragment {
     TextView txtPostsCount;
     View rootView;
 
+    private Context context;
+
+    SharedPreferences sharedpreferences;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -41,43 +65,95 @@ public class Me extends Fragment {
 
         rootView = inflater.inflate(R.layout.activity_me, container, false);
 
-        final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtInterestsCount);
-        textViewToChange.setText("100");
+        sharedpreferences = getContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
 
-        //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable)((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 180));
-        //((ImageButton)rootView.findViewById(R.id.profile)).setEnabled(false);
-        //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap()));
-        ((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(MLRoundedImageView.getCroppedBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 80));
+        context = getActivity();
 
-        txtInterests = (TextView) rootView.findViewById(R.id.txtInterests);
-        txtInterestsCount = (TextView) rootView.findViewById(R.id.txtInterestsCount);
-        txtPosts = (TextView) rootView.findViewById(R.id.txtPosts);
-        txtPostsCount = (TextView) rootView.findViewById(R.id.txtPostsCount);
+        if(sharedpreferences.contains("loggedin")) {
 
-        rootView.findViewById(R.id.showInterests).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Interests clicked!");
-                displayInterests();
-            }
-        });
+            final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtInterestsCount);
+            textViewToChange.setText("100");
 
-        rootView.findViewById(R.id.showPosts).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "Own Posts clicked!");
-                displayOwnPosts();
-            }
-        });
+            RelativeLayout coverImage = (RelativeLayout) rootView.findViewById(R.id.containerTop);
 
-        frame = (FrameLayout) rootView.findViewById(R.id.containerMe);
+            Uri imageUri = Uri.parse("https://vilostorage.s3.amazonaws.com/profilepics/user_41444676563.png");
+            //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
 
-        Log.d(TAG, "bla"+frame);
+            ImageButton profileImage = (ImageButton) rootView.findViewById(R.id.profile);
 
-        //displayInterests();
+            //Picasso.with(getContext()).load("https://vilostorage.s3.amazonaws.com/profilepics/user_41444676563.png").into(coverImage);
+
+            //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable)((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 180));
+            //((ImageButton)rootView.findViewById(R.id.profile)).setEnabled(false);
+            //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap()));
+            ((ImageButton) rootView.findViewById(R.id.profile)).setImageBitmap(MLRoundedImageView.getCroppedBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 80));
+
+
+            txtInterests = (TextView) rootView.findViewById(R.id.txtInterests);
+            txtInterestsCount = (TextView) rootView.findViewById(R.id.txtInterestsCount);
+            txtPosts = (TextView) rootView.findViewById(R.id.txtPosts);
+            txtPostsCount = (TextView) rootView.findViewById(R.id.txtPostsCount);
+
+            rootView.findViewById(R.id.showInterests).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Interests clicked!");
+                    displayInterests();
+                }
+            });
+
+            rootView.findViewById(R.id.showPosts).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Own Posts clicked!");
+                    displayOwnPosts();
+                }
+            });
+
+            frame = (FrameLayout) rootView.findViewById(R.id.containerMe);
+
+            ModelManager modelManager = new ModelManager();
+            Uri myUri = Uri.parse("https://vilostorage.s3.amazonaws.com/profilepics/user_31437672110.jpg");
+            byte[] myBytes = modelManager.convertImageToByte(myUri, getContext());
+
+            Log.d(TAG, "bytes: " + myBytes);
+
+            Log.d(TAG, "bla" + frame);
+
+            displayInterests();
+
+            setHasOptionsMenu(true);
+
+        }
 
         return rootView; //inflater.inflate(R.layout.activity_me, container, false);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "VIEW RESUMED");
+
+        if(sharedpreferences.contains("loggedin")){
+
+            Realm realm = Realm.getInstance(context);
+            // Build the query looking at all users:
+            RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+            // Execute the query:
+            RealmResults<CDUser> result = query.findAll();
+
+            getActivity().setTitle(result.first().getFirst_name());
+
+
+        } else {
+            Log.d(TAG, "logged in pref is not set");
+            Intent intent = new Intent(getActivity(), Login.class);
+            startActivity(intent);
+        }
+    }
+
 
     void displayInterests() {
         //frame.removeAllViews();
@@ -95,6 +171,20 @@ public class Me extends Fragment {
         ListViewAdapter adapter = new ListViewAdapter(getActivity(), R.layout.me_interests, myStringArray1);
         myListView.setAdapter(adapter);
 
+
+        myListView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener()
+                {
+                    @Override
+                    public void onItemClick(AdapterView<?> arg0, View view,
+                                            int position, long id) {
+
+                        Log.d(TAG, "item clicked!");
+
+                        //Take action here.
+                    }
+                }
+        );
         //view.startAnimation(AnimationUtils.loadAnimation(getActivity(), 0x7f040002));
 
         //rootView.inflate(R.layout.me_interests, frame, false);
@@ -109,6 +199,7 @@ public class Me extends Fragment {
         //frame.addView(myListView);
         interestsSelected();
     }
+
 
     void displayOwnPosts() {
 
@@ -146,6 +237,16 @@ public class Me extends Fragment {
         txtPostsCount.setTextColor(getResources().getColor(R.color.colorAccent));
         txtInterests.setTextColor(getResources().getColor(R.color.colorPrimary));
         txtInterestsCount.setTextColor(getResources().getColor(R.color.colorPrimary));
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.add("Radius")
+                .setIcon(R.drawable.nav_settings)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+        inflater.inflate(R.menu.menu_tabbar, menu);
     }
 
 }

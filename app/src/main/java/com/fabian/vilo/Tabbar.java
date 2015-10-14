@@ -30,6 +30,17 @@ import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Animation;
 
+import com.fabian.vilo.models.CDModels.CDUser;
+import com.facebook.FacebookSdk;
+import com.facebook.appevents.AppEventsLogger;
+
+import java.net.CookieHandler;
+import java.net.CookiePolicy;
+
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+
 public class Tabbar extends AppCompatActivity {
 
     private static final String TAG = Tabbar.class.getSimpleName();
@@ -40,6 +51,13 @@ public class Tabbar extends AppCompatActivity {
         setContentView(R.layout.activity_tabbar);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
+
+        FacebookSdk.sdkInitialize(this);
+
+        // enable cookies
+        java.net.CookieManager cookieManager = new java.net.CookieManager();
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+        CookieHandler.setDefault(cookieManager);
 
         FloatingActionButton uploadBtn = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -91,9 +109,21 @@ public class Tabbar extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 Log.d(TAG, "value = " + tab.getPosition());
 
+                //getSupportActionBar().setDisplayShowTitleEnabled(false);
+                //getSupportActionBar().setDisplayShowHomeEnabled(false);
+                //getSupportActionBar().hide();
+                //getSupportActionBar().getHeight();
+
                 if (tab.getPosition() == 0) {
                     getSupportActionBar().setTitle("Around Me");
                 } else {
+                    /*Realm realm = Realm.getInstance(getApplicationContext());
+                    // Build the query looking at all users:
+                    RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+                    // Execute the query:
+                    RealmResults<CDUser> result = query.findAll();
+                    getSupportActionBar().setTitle(result.first().getFirst_name());*/
                     getSupportActionBar().setTitle("Me");
                 }
 
@@ -115,6 +145,11 @@ public class Tabbar extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        /*menu.add("Share")
+                .setIcon(android.R.drawable.ic_menu_share)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);*/
+
         getMenuInflater().inflate(R.menu.menu_tabbar, menu);
         return true;
     }
@@ -127,5 +162,21 @@ public class Tabbar extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Logs 'install' and 'app activate' App Events.
+        AppEventsLogger.activateApp(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // Logs 'app deactivate' App Event.
+        AppEventsLogger.deactivateApp(this);
     }
 }

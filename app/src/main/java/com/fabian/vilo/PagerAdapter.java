@@ -5,6 +5,7 @@ package com.fabian.vilo;
  */
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
@@ -16,7 +17,6 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
         this.mNumOfTabs = NumOfTabs;
     }
 
-    @Override
     public Fragment getItem(int position) {
 
         switch (position) {
