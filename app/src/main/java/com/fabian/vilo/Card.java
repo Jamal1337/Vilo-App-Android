@@ -12,14 +12,56 @@ import java.util.ArrayList;
 public class Card {
     public String title;
     public String text;
+    public int postid;
+    public int type;
+    public int category;
+    public int commentCount;
+    public int interestCount;
+    public String timeAgo;
+    public String distance;
+    public String username;
+    public String attachment;
+    public String timestamp;
+    public int userid;
+    public String photo;
+    public float longitude;
+    public float latitude;
+    public int radius;
+    public String event_date;
+    public int location_id;
+    public String last_updated;
+    public int isAttended;
+    public int topTip;
 
-    public Card(String title, String text) {
+    public Card(String title, String text, int postid, int type, int category, int commentCount, int interestCount, String timeAgo, String distance, String username, String attachment, String timestamp,
+    int userid, String photo, float latitude, float longitude, int radius, String event_date, int location_id, String last_updated, int isAttended, int topTip) {
         this.title = title;
         this.text = text;
+        this.postid = postid;
+        this.type = type;
+        this.category = category;
+        this.commentCount = commentCount;
+        this.interestCount = interestCount;
+        this.timeAgo = timeAgo;
+        this.distance = distance;
+        this.username = username;
+        this.attachment = attachment;
+        this.timestamp = timestamp;
+        this.userid = userid;
+        this.photo = photo;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.radius = radius;
+        this.event_date = event_date;
+        this.location_id = location_id;
+        this.last_updated = last_updated;
+        this.isAttended = isAttended;
+        this.topTip = topTip;
+
     }
 
     // Constructor to convert JSON object into a Java class instance
-    public Card(JSONObject object){
+    /*public Card(JSONObject object){
         try {
             this.title = object.getString("title");
             this.text = object.getString("text");
@@ -40,5 +82,5 @@ public class Card {
             }
         }
         return cards;
-    }
+    }*/
 }

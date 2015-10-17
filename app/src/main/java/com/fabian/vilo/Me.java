@@ -9,8 +9,11 @@ import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -86,7 +89,7 @@ public class Me extends Fragment {
             //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable)((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 180));
             //((ImageButton)rootView.findViewById(R.id.profile)).setEnabled(false);
             //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap()));
-            ((ImageButton) rootView.findViewById(R.id.profile)).setImageBitmap(MLRoundedImageView.getCroppedBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 80));
+            //((ImageButton) rootView.findViewById(R.id.profile)).setImageBitmap(MLRoundedImageView.getCroppedBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 80));
 
 
             txtInterests = (TextView) rootView.findViewById(R.id.txtInterests);
@@ -129,7 +132,7 @@ public class Me extends Fragment {
         return rootView; //inflater.inflate(R.layout.activity_me, container, false);
     }
 
-    @Override
+    /*@Override
     public void onResume() {
         super.onResume();
 
@@ -151,6 +154,30 @@ public class Me extends Fragment {
             Log.d(TAG, "logged in pref is not set");
             Intent intent = new Intent(getActivity(), Login.class);
             startActivity(intent);
+        }
+    }*/
+
+    /*@Override
+    public void onResume() {
+        super.onResume();
+        Handler handler = getActivity().getWindow().getDecorView().getHandler();
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                // initialize the loader here!
+                getLoaderManager().initLoader(0, null, context);
+                getLoaderManager().initLoader(0, null, Tabbar.this);
+            }
+        });
+    }*/
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            Log.d(TAG, "ME SCREEN APPEARED");
+        } else {
+            Log.d(TAG, "ME SCREEN DISAPPEARED");
         }
     }
 
@@ -179,6 +206,10 @@ public class Me extends Fragment {
                     public void onItemClick(AdapterView<?> arg0, View view,
                                             int position, long id) {
 
+                        /*FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                                        .replace(R.id.meLayout, new ItemListFragment())
+                                                        .commit();*/
                         Log.d(TAG, "item clicked!");
 
                         //Take action here.

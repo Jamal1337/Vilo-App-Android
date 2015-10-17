@@ -1,6 +1,7 @@
 package com.fabian.vilo;
 
 import com.fabian.vilo.cards.Posts;
+import com.fabian.vilo.cards.QuickpostCard;
 import com.fabian.vilo.models.FbUserAuth;
 import com.fabian.vilo.models.User;
 
@@ -38,6 +39,12 @@ public interface ViloApiEndpointInterface {
 
     @POST("/api/v1/user/fbauth")
     Call<User> saveUser(@Body FbUserAuth userAuth);
+
+    @POST("/api/v1/user/fbauth")
+    Call<User> reAuth(@Body FbUserAuth userAuth);
+
+    @GET("/api/v1/post/quick/{postid}")
+    Call<QuickpostCard> getQuickPost(@Path("postid") int postid);
 
     /*@GET("/v2/post/around/me")
     void  getPosts(

@@ -25,7 +25,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.fabian.vilo.cards.Posts;
+import com.fabian.vilo.cards.QuickpostCard;
 import com.fabian.vilo.models.CDModels.CDUser;
+import com.fabian.vilo.models.FbUserAuth;
+import com.fabian.vilo.models.User;
+import com.facebook.AccessToken;
 import com.skyfishjy.library.RippleBackground;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 
@@ -60,13 +64,18 @@ public class AroundMe extends Fragment {
 
     private ArrayList<Card> al;
     private CardAdapter arrayAdapter;
+    private int cardCounter;
     private int i;
     private RippleBackground rippleBackground;
+
+    private GPSTracker gps;
 
     private double current_lattitude;
     private double current_longitude;
 
     private int cardCount;
+
+    private int totalPosts;
 
     SharedPreferences sharedpreferences;
 
@@ -119,18 +128,21 @@ public class AroundMe extends Fragment {
             }
         });*/
 
+        AccessToken token = AccessToken.getCurrentAccessToken();
+        Log.d(TAG, "current access token: "+token.getToken());
+
         sharedpreferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
 
-        GPSTracker gps = new GPSTracker(context);
-        int status = 0;
-        if(gps.canGetLocation())
+        gps = new GPSTracker(context);
+
+        /*if(gps.canGetLocation())
 
         {
             /*status = GooglePlayServicesUtil
                     .isGooglePlayServicesAvailable(context);
 
             if (status == ConnectionResult.SUCCESS) {*/
-            current_lattitude = gps.getLatitude();
+            /*current_lattitude = gps.getLatitude();
             current_longitude = gps.getLongitude();
             Log.d("dashlatlongon", "" + current_lattitude + "-"
                         + current_longitude);
@@ -146,9 +158,9 @@ public class AroundMe extends Fragment {
                 current_longitude = 22.22;
             }*/
 
-        } else {
+        /*} else {
             gps.showSettingsAlert();
-        }
+        }*/
 
         setHasOptionsMenu(true);
 
@@ -190,6 +202,22 @@ public class AroundMe extends Fragment {
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isResumed()) {
+            if (isVisibleToUser && sharedpreferences.contains("loggedin") && isResumed()) {
+                Log.d(TAG, "AROUND ME SCREEN APPEARED");
+                getActivity().setTitle("Around Me");
+                rippleBackground.startRippleAnimation();
+                fetchPosts(rootView);
+            } else {
+                Log.d(TAG, "AROUND ME SCREEN DISAPPEARED");
+                flingContainer.removeAllViewsInLayout();
+            }
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         getActivity().setTitle("Around Me");
@@ -204,7 +232,7 @@ public class AroundMe extends Fragment {
             // Execute the query:
             RealmResults<CDUser> result = query.findAll();
 
-            Log.d(TAG, "userinfo: "+result.first().getFirst_name());
+            Log.d(TAG, "userinfo: " + result.first().getFirst_name());
 
             fetchPosts(rootView);
 
@@ -216,89 +244,155 @@ public class AroundMe extends Fragment {
         }
     }
 
-    private boolean fetchPosts(View view) {
+    private void fetchPosts(View view) {
 
-        /*Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();*/
+        if(gps.canGetLocation())
 
-        ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(context);
+        {
 
-        ViloApiEndpointInterface apiService = viloAdapter.mApi;
+            SharedPreferences.Editor editor = sharedpreferences.edit();
+            current_lattitude = gps.getLatitude();
+            current_longitude = gps.getLongitude();
 
-        Call<Posts> call = apiService.getPosts(sharedpreferences.getString("lat", "0"), sharedpreferences.getString("lng", "0"), sharedpreferences.getInt("radius", 10000), "mi");
+            editor.putString("lat", "" + current_lattitude);
+            editor.putString("lng", "" + current_longitude);
+            editor.commit();
 
-        al = new ArrayList<Card>();
 
-        Log.d(TAG, "result: " + call);
-        call.enqueue(new Callback<Posts>() {
-            @Override
-            public void onResponse(Response<Posts> response, Retrofit retrofit) {
-                int statusCode = response.code();
-                Log.d(TAG, "response raw: " + response.raw());
-                Log.d(TAG, "response statusCode: " + statusCode);
-                Log.d(TAG, "response: " + response.body().data);
+            ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(context);
 
-                for (int i = 0; i < response.body().data.size(); i++) {
-                    Log.d(TAG, "value: " + response.body().data.get(i).id);
-                    al.add(new Card("bla", "blub"));
+            ViloApiEndpointInterface apiService = viloAdapter.mApi;
 
-                    cardCount = response.body().data.size();
+            Call<Posts> call = apiService.getPosts(sharedpreferences.getString("lat", "0"), sharedpreferences.getString("lng", "0"), sharedpreferences.getInt("radius", 10000), "mi");
 
-                    if (i == response.body().data.size() - 1) {
+            al = new ArrayList<Card>();
 
-                        getActivity().setTitle("Around Me ("+cardCount+" Posts)");
-                        createCards();
+            Log.d(TAG, "result: " + call);
+            call.enqueue(new Callback<Posts>() {
+                @Override
+                public void onResponse(Response<Posts> response, Retrofit retrofit) {
+                    int statusCode = response.code();
+                    Log.d(TAG, "response raw: " + response.raw());
+                    Log.d(TAG, "response statusCode: " + statusCode);
+
+                    if (statusCode == 200) {
+                        Log.d(TAG, "response: " + response.body().data);
+
+                        cardCounter = 0;
+
+                        if (response.body().data.size() > 0) {
+                            totalPosts = response.body().data.size();
+                            for (int j = 0; j < response.body().data.size(); j++) {
+
+                                CardManager cardManager = new CardManager(context);
+
+                                switch (response.body().data.get(j).type) {
+                                    case 0: Log.d(TAG, "Post is Quick & "+j+ " / "+totalPosts);
+                                        //Card quickCard = cardManager.getQuickPost(response.body().data.get(i).id);
+                                        cardCounter++;
+
+                                        ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(context);
+
+                                        ViloApiEndpointInterface apiService = viloAdapter.mApi;
+
+                                        Call<QuickpostCard> call = apiService.getQuickPost(response.body().data.get(j).id);
+
+                                        call.enqueue(new Callback<QuickpostCard>() {
+                                            @Override
+                                            public void onResponse(Response<QuickpostCard> response, Retrofit retrofit) {
+                                                QuickpostCard qpCard = response.body();
+                                                al.add(new Card(qpCard.title, qpCard.text, qpCard.id, qpCard.type, 0, qpCard.commentcount, qpCard.followers, "", "", qpCard.username, qpCard.attachment, qpCard.timestamp,
+                                                        qpCard.userid, qpCard.photo, qpCard.lat, qpCard.lng, qpCard.radius, "", 0, qpCard.last_updated, 0, qpCard.topTip));
+
+                                                if (cardCounter == totalPosts) {
+
+                                                    getActivity().setTitle("Around Me (" + cardCount + " Posts)");
+                                                    createCards();
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onFailure(Throwable t) {
+                                                Log.d("", "error: " + t.getMessage());
+                                            }
+                                        });
+
+                                        break;
+                                    case 1: Log.d(TAG, "Post is Event & "+j+ " / "+totalPosts);
+                                        cardManager.getEventPost(response.body().data.get(j).id);
+                                        cardCounter++;
+                                        if (cardCounter == response.body().data.size() - 1) {
+
+                                            getActivity().setTitle("Around Me (" + cardCount + " Posts)");
+                                            createCards();
+                                        }
+                                        break;
+                                    case 2: Log.d(TAG, "Post is Poll & "+j+ " / "+totalPosts);
+                                        cardCounter++;
+                                        if (cardCounter == totalPosts) {
+
+                                            getActivity().setTitle("Around Me (" + cardCount + " Posts)");
+                                            createCards();
+                                        }
+                                        break;
+                                    case 3: Log.d(TAG, "Post is PhotoAlbum & "+j+ " / "+totalPosts);
+                                        cardCounter++;
+                                        if (cardCounter == totalPosts) {
+
+                                            getActivity().setTitle("Around Me (" + cardCount + " Posts)");
+                                            createCards();
+                                        }
+                                        break;
+                                    case 4: Log.d(TAG, "Post is Meetup & "+j+ " / "+totalPosts);
+                                        cardCounter++;
+                                        if (cardCounter == totalPosts) {
+
+                                            getActivity().setTitle("Around Me (" + cardCount + " Posts)");
+                                            createCards();
+                                        }
+                                        break;
+                                    default: break;
+                                }
+                                Log.d(TAG, "value: " + response.body().data.get(j).id);
+                                //al.add(new Card("bla", "blub"));
+
+                                cardCount = cardCounter;
+
+
+                            }
+                        } else {
+                            rippleBackground.stopRippleAnimation();
+                        }
+                    } else {
+                        String locale = context.getResources().getConfiguration().locale.getCountry();
+                        FbUserAuth userAuth = new FbUserAuth();
+                        userAuth.interests_push = 0;
+                        userAuth.own_push = 1;
+                        userAuth.origin = locale;
+                        userAuth.token = AccessToken.getCurrentAccessToken().getToken();
+
+                        reauthUser(userAuth);
                     }
+
+
                 }
-                //createCards();
 
-                Log.d(TAG, "first loop");
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.d(TAG, "error: " + t.getMessage());
+                }
+            });
 
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Log.d(TAG, "error: " + t.getMessage());
-            }
-        });
-
-        Log.d(TAG, "second loop");
-
-        //al.add(new Card("bla", "blub"));
-        //createCards();
-
-        /*al = new ArrayList<String>();
-        al.add("php");
-        al.add("c");
-        al.add("python");
-        al.add("java");*/
-
-        //choose your favorite adapter
-       // arrayAdapter = new ArrayAdapter<String>(context,R.layout.item,R.id.helloText,al);
-
-        //ArrayList<Card> ab = new ArrayList<Card>();
-        //ab.add(new Card("bla", "blub"));
-
-        // Construct the data source
-
-
-// Create the adapter to convert the array to views
-        //UsersAdapter adapter = new UsersAdapter(this, arrayOfUsers);
-// Attach the adapter to a ListView
-        //ListView listView = (ListView) findViewById(R.id.lvItems);
-        //listView.setAdapter(adapter);
-
-        //arrayAdapter = new CardAdapter(context, R.layout.item, arrayOfUsers);
-
-
-
-        return true;
+        } else {
+            gps.showSettingsAlert();
+        }
     }
-        //new Loaditems().execute();
+
 
     public void createCards() {
+
+        Log.d(TAG, "number of cards:" +al.size());
+
         arrayAdapter = new CardAdapter(context, R.layout.item, al) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -524,4 +618,25 @@ public class AroundMe extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    public void reauthUser(FbUserAuth userAuth) {
+        ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(context);
+
+        ViloApiEndpointInterface apiService = viloAdapter.mApi;
+
+        Call<User> call = apiService.saveUser(userAuth);
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Response<User> response, Retrofit retrofit) {
+                fetchPosts(rootView);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "error: " + t.getMessage());
+            }
+        });
+    }
+
 }

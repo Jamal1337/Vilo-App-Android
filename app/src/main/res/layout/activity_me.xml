@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout android:orientation="vertical" android:background="@color/grey_bg" android:layout_width="fill_parent" android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
-<RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/meLayout">
     <RelativeLayout android:id="@+id/containerTop" android:background="@drawable/me_bg" android:paddingTop="10.0dip" android:layout_width="fill_parent" android:layout_height="180.0dip">
         <ImageButton android:id="@+id/profile" android:layout_width="90.0dip" android:layout_height="90.0dip" android:src="@drawable/fb" android:scaleType="fitXY" android:layout_centerHorizontal="true" style="?android:attr/borderlessButtonStyle" />
         <LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/profile">
