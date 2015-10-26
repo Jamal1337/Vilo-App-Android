@@ -90,7 +90,7 @@ public class SerializableHttpCookie implements Serializable {
         } catch (Exception e) {
             // NoSuchFieldException || IllegalAccessException ||
             // IllegalArgumentException
-            Log.w(TAG, e);
+            //Log.w(TAG, e);
         }
         return false;
     }

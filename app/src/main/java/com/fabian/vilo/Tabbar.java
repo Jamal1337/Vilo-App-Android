@@ -107,27 +107,6 @@ public class Tabbar extends AppCompatActivity {
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                Log.d(TAG, "value = " + tab.getPosition());
-
-                //getSupportActionBar().setDisplayShowTitleEnabled(false);
-                //getSupportActionBar().setDisplayShowHomeEnabled(false);
-                //getSupportActionBar().hide();
-                //getSupportActionBar().getHeight();
-
-                if (tab.getPosition() == 0) {
-                    getSupportActionBar().setTitle("Around Me");
-                } else {
-                    /*Realm realm = Realm.getInstance(getApplicationContext());
-                    // Build the query looking at all users:
-                    RealmQuery<CDUser> query = realm.where(CDUser.class);
-
-                    // Execute the query:
-                    RealmResults<CDUser> result = query.findAll();
-                    getSupportActionBar().setTitle(result.first().getFirst_name());*/
-                    getSupportActionBar().setTitle("Me");
-                }
-
-
                 viewPager.setCurrentItem(tab.getPosition());
             }
 

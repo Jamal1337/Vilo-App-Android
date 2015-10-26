@@ -28,15 +28,28 @@
         app:rb_duration="3000"
         app:rb_scale="6">
 
-        <ImageButton
-            android:layout_width="90.0dip"
-            android:layout_height="90.0dip"
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FFFFFF"
+            android:layout_width="70.0dip"
+            android:layout_height="70.0dip"
             android:layout_centerInParent="true"
             android:id="@+id/centerImage"
-            android:scaleType="fitXY"
-            style="?android:attr/borderlessButtonStyle"
             android:src="@drawable/fb"/>
     </com.skyfishjy.library.RippleBackground>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Searching for posts around you...."
+        android:id="@+id/searchingText"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="66dp"
+        android:textColor="#FFFFFF"
+        android:layout_marginRight="25dp"
+        android:layout_marginLeft="25dp" />
 
 </RelativeLayout>
 </FrameLayout>

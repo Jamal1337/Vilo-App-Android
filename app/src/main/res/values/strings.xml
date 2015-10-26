@@ -6,4 +6,6 @@
     <string name="right_arrow">></string>
     <string name="distance">10 km</string>
     <string name="facebook_app_id">1495136917391994</string>
+    <string name="searchLabel">Searching for posts around you...</string>
+    <string name="no_posts_found">No posts found.</string>
 </resources>

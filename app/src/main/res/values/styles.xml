@@ -6,8 +6,8 @@
         <item name="colorPrimary">#3F51B5</item>
         <!--   darker variant for the status bar and contextual app bars -->
         <item name="colorPrimaryDark">#303F9F</item>
-        <!--<item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>-->
+        <!--<item_event name="windowNoTitle">true</item_event>
+        <item_event name="windowActionBar">false</item_event>-->
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">#FF4081</item>
     </style>

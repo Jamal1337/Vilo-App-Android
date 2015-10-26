@@ -3,7 +3,16 @@
 xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
 <RelativeLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/meLayout">
     <RelativeLayout android:id="@+id/containerTop" android:background="@drawable/me_bg" android:paddingTop="10.0dip" android:layout_width="fill_parent" android:layout_height="180.0dip">
-        <ImageButton android:id="@+id/profile" android:layout_width="90.0dip" android:layout_height="90.0dip" android:src="@drawable/fb" android:scaleType="fitXY" android:layout_centerHorizontal="true" style="?android:attr/borderlessButtonStyle" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/profile"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FFFFFF"
+            android:layout_width="70.0dip"
+            android:layout_height="70.0dip"
+            android:src="@drawable/fb"
+            android:layout_centerHorizontal="true"
+            style="?android:attr/borderlessButtonStyle" />
         <LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/profile">
             <LinearLayout android:gravity="right" android:id="@+id/btnInterests" android:paddingTop="15.0dip" android:paddingBottom="15.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_weight="0.45">
                 <LinearLayout android:gravity="left" android:id="@+id/showInterests" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:clickable="true">
@@ -25,11 +34,18 @@ xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://sch
     <FrameLayout android:id="@+id/containerMe" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/containerTop"
         android:backgroundTint="#ffffff">
 
+        <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
         <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/listView"
             android:layout_gravity="left|top" />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
     </FrameLayout>
 </RelativeLayout>
 </FrameLayout>

@@ -1,16 +1,23 @@
 package com.fabian.vilo;
 
+import com.fabian.vilo.cards.EventpostCard;
 import com.fabian.vilo.cards.Posts;
 import com.fabian.vilo.cards.QuickpostCard;
 import com.fabian.vilo.models.FbUserAuth;
 import com.fabian.vilo.models.User;
+import com.fabian.vilo.models.ViloResponse;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import retrofit.Call;
+import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.Headers;
 import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
 
 
@@ -45,6 +52,12 @@ public interface ViloApiEndpointInterface {
 
     @GET("/api/v1/post/quick/{postid}")
     Call<QuickpostCard> getQuickPost(@Path("postid") int postid);
+
+    @GET("/api/v1/post/event/{postid}")
+    Call<EventpostCard> getEventPost(@Path("postid") int postid);
+
+    @PUT("/api/v1/post/swipe")
+    Call<ViloResponse> pushSwipedPosts(@Body Map<String,ArrayList> swipedPosts);
 
     /*@GET("/v2/post/around/me")
     void  getPosts(

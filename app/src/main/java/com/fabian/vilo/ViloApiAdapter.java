@@ -1,8 +1,13 @@
 package com.fabian.vilo;
 
+import com.fabian.vilo.cards.Deserializer;
+
 import android.content.Context;
 import android.util.Log;
 
+import com.fabian.vilo.cards.EventpostCard;
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -66,7 +71,7 @@ public class ViloApiAdapter {
                 Buffer buffer = new Buffer();
                 //request.body().writeTo(buffer);
 
-                Log.i(TAG,"Request to " + request.urlString() + "\n" + buffer.readUtf8());
+                Log.i(TAG, "Request to " + request.urlString() + "\n" + buffer.readUtf8());
                 long t1 = System.nanoTime();
                 com.squareup.okhttp.Response response = chain.proceed(request);
                 long t2 = System.nanoTime();
@@ -82,6 +87,10 @@ public class ViloApiAdapter {
         httpClient.setCookieHandler(new CookieManager(
                 new PersistentCookieStore(context),
                 CookiePolicy.ACCEPT_ALL));
+
+        /*GsonBuilder  gsonBuilder = new GsonBuilder();
+        gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+        gsonBuilder.registerTypeAdapter(EventpostCard.class, new Deserializer<EventpostCard>());*/
 
         mRestAdapter = new Retrofit.Builder()
                 .baseUrl(BASE_URL)

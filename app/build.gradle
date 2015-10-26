@@ -43,4 +43,5 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'com.facebook.android:facebook-android-sdk:4.6.0'
     compile 'io.realm:realm-android:0.83.0'
+    compile 'de.hdodenhof:circleimageview:2.0.0'
 }

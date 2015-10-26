@@ -1,11 +1,6 @@
 package com.fabian.vilo;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.ShapeDrawable;
-import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,31 +32,35 @@ public class CardAdapter extends ArrayAdapter<Card> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        // Get the data item for this position
+        // Get the data item_event for this position
         Card card = getItem(position);
+
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
         if (convertView == null) {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.item_quick, parent, false);
 
-            Log.d("test", "value: "+card.title);
+            if (card.type == 0) {
+                convertView = inflater.inflate(R.layout.item_quick, parent, false);
+                viewHolder.postText = (TextView) convertView.findViewById(R.id.postText);
+            } else if (card.type == 1) {
+                convertView = inflater.inflate(R.layout.item_event, parent, false);
+                viewHolder.cardLocation = (TextView) convertView.findViewById(R.id.cardLocation);
+                viewHolder.cardHome = (TextView) convertView.findViewById(R.id.cardHome);
+                viewHolder.cardCalendar = (TextView) convertView.findViewById(R.id.cardCalendar);
+            }
+
+
 
             viewHolder.title = (TextView) convertView.findViewById(R.id.cardTitle);
-            //viewHolder.text = (TextView) convertView.findViewById(R.id.cardLocation);
             viewHolder.cardImage = (ImageView) convertView.findViewById(R.id.cardImage);
+            viewHolder.userImage = (ImageView) convertView.findViewById(R.id.userImage);
             viewHolder.cardView = (RelativeLayout) convertView.findViewById(R.id.cardView);
-            viewHolder.postText = (TextView) convertView.findViewById(R.id.postText);
             viewHolder.cardDistance = (TextView) convertView.findViewById(R.id.cardDistance);
             viewHolder.cardTime = (TextView) convertView.findViewById(R.id.cardTime);
             viewHolder.cardLikes = (TextView) convertView.findViewById(R.id.cardLikes);
             viewHolder.cardComments = (TextView) convertView.findViewById(R.id.cardComments);
-
-            viewHolder.title.setText(card.title);
-            viewHolder.postText.setText(card.text);
-            //viewHolder.cardComments.setText(card.commentCount);
-            //viewHolder.cardLikes.setText(card.interestCount);
 
             convertView.setTag(viewHolder);
         } else {
@@ -69,13 +68,47 @@ public class CardAdapter extends ArrayAdapter<Card> {
         }
         // Populate the data into the template view using the data object
 
-        Picasso.with(context)
-                .load(R.drawable.rehab)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.placeholder)
-                .centerCrop()
-                .fit()
-                .into(viewHolder.cardImage);
+
+        if(card != null) {
+
+            if (card.type == 0) {
+                viewHolder.postText.setText(card.text);
+            } else if (card.type == 1) {
+                viewHolder.cardCalendar.setText(card.event_date);
+                viewHolder.cardLocation.setText(card.location.get(0).name);
+                String adress = card.location.get(0).street+", "+card.location.get(0).city;
+                viewHolder.cardHome.setText(adress);
+            }
+
+
+            viewHolder.title.setText(card.title);
+            viewHolder.cardLikes.setText(""+card.interestCount);
+            viewHolder.cardComments.setText(""+card.commentCount);
+            viewHolder.cardDistance.setText(card.distance);
+            viewHolder.cardTime.setText(card.timeAgo);
+
+            /*Picasso.with(context)
+                    .load(card.photo)
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    //.centerCrop()
+                    .fit()
+                    .into(viewHolder.userImage);
+
+            Picasso.with(context)
+                    .load(card.attachment)
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    //.centerCrop()
+                    .fit()
+                    .into(viewHolder.cardImage);*/
+
+            new ImageDownloader(viewHolder.userImage).execute(card.photo);
+            new ImageDownloader(viewHolder.cardImage).execute(card.attachment);
+        }
+
+
+
         // Return the completed view to render on screen
         return convertView;
     }
@@ -83,13 +116,17 @@ public class CardAdapter extends ArrayAdapter<Card> {
     static class ViewHolder
     {
         TextView title;
-        //TextView text;
         TextView postText;
         ImageView cardImage;
+        ImageView userImage;
         RelativeLayout cardView;
         TextView cardDistance;
         TextView cardTime;
         TextView cardLikes;
         TextView cardComments;
+
+        TextView cardLocation;
+        TextView cardHome;
+        TextView cardCalendar;
     }
 }

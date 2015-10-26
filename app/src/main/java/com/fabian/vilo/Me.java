@@ -1,19 +1,18 @@
 package com.fabian.vilo;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.content.res.Configuration;
 import android.net.Uri;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import android.provider.MediaStore;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,28 +22,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Button;
-import android.view.animation.AnimationUtils;
-import android.util.Log;
-import android.content.res.Resources;
-import android.graphics.drawable.BitmapDrawable;
+
 import java.util.ArrayList;
 import android.widget.ListView;
 
+import com.fabian.vilo.models.CDModels.CDPost;
 import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
-public class Me extends Fragment {
+public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = Me.class.getSimpleName();
 
@@ -56,6 +50,13 @@ public class Me extends Fragment {
     TextView txtPosts;
     TextView txtPostsCount;
     View rootView;
+    Realm realm;
+
+    private ArrayList<CDPost> listViewPosts = new ArrayList<CDPost>();
+    private ListView myListView;
+    private ListViewAdapter adapter;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private Context context;
 
@@ -66,7 +67,7 @@ public class Me extends Fragment {
 
         super.onCreate(savedInstanceState);
 
-        rootView = inflater.inflate(R.layout.activity_me, container, false);
+        rootView = inflater.inflate(R.layout.activity_me_2, container, false);
 
         sharedpreferences = getContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
 
@@ -74,28 +75,94 @@ public class Me extends Fragment {
 
         if(sharedpreferences.contains("loggedin")) {
 
-            final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtInterestsCount);
-            textViewToChange.setText("100");
-
             RelativeLayout coverImage = (RelativeLayout) rootView.findViewById(R.id.containerTop);
 
-            Uri imageUri = Uri.parse("https://vilostorage.s3.amazonaws.com/profilepics/user_41444676563.png");
             //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), imageUri);
 
-            ImageButton profileImage = (ImageButton) rootView.findViewById(R.id.profile);
+            //ImageButton profileImage = (ImageButton) rootView.findViewById(R.id.profile);
 
-            //Picasso.with(getContext()).load("https://vilostorage.s3.amazonaws.com/profilepics/user_41444676563.png").into(coverImage);
+
+            realm = Realm.getInstance(context);
+
+            // Build the query looking at all users:
+            RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+            // Execute the query:
+            RealmResults<CDUser> result = query.findAll();
+
+            //Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
 
             //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable)((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 180));
             //((ImageButton)rootView.findViewById(R.id.profile)).setEnabled(false);
             //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap()));
             //((ImageButton) rootView.findViewById(R.id.profile)).setImageBitmap(MLRoundedImageView.getCroppedBitmap(((BitmapDrawable) ((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 80));
 
+            myListView = (ListView) rootView.findViewById(R.id.listView);
+            /*swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+            swipeRefreshLayout.setOnRefreshListener(this);
 
-            txtInterests = (TextView) rootView.findViewById(R.id.txtInterests);
-            txtInterestsCount = (TextView) rootView.findViewById(R.id.txtInterestsCount);
-            txtPosts = (TextView) rootView.findViewById(R.id.txtPosts);
-            txtPostsCount = (TextView) rootView.findViewById(R.id.txtPostsCount);
+            /**
+             * Showing Swipe Refresh animation on activity create
+             * As animation won't start on onCreate, post runnable is used
+             */
+            /*swipeRefreshLayout.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            swipeRefreshLayout.setRefreshing(true);
+
+                                            refreshInterests();
+                                        }
+                                    }
+            );*/
+
+            View header = getActivity().getLayoutInflater().inflate(R.layout.me_list_header, null);
+            myListView.addHeaderView(header);
+
+            adapter = new ListViewAdapter(getActivity(), R.layout.listview_quickpost, listViewPosts, this);
+            myListView.setAdapter(adapter);
+
+            myListView.setOnItemClickListener(
+                    new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> arg0, View view,
+                                                int position, long id) {
+
+                        /*FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                                        .replace(R.id.meLayout, new ItemListFragment())
+                                                        .commit();*/
+                            Log.d(TAG, "item at row "+position+" clicked!");
+                            Log.d(TAG, "title of cell: "+listViewPosts.get(position-1).getTitle());
+
+                            // Go to Detail Activity
+                        /*Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                        // Send the position number to Detail Activity too.
+                        i.putExtra("position", position);
+                        // Run the process
+                        startActivity(i);*/
+
+                            /*Intent detailIntent = new Intent(context, QuickpostDetail.class);
+                            detailIntent.putExtra(QuickpostDetail.ARG_ITEM_ID, id);
+                            startActivity(detailIntent);*/
+
+                            //Take action here.
+
+                            android.support.v4.app.Fragment detail = new QuickpostDetail();
+                            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                            fragmentManager.beginTransaction().replace(R.id.containerMe, detail).addToBackStack("back").commit();
+                            //fragmentManager.beginTransaction().add(R.id.listView, detail).addToBackStack("back").commit();
+                        }
+                    }
+            );
+
+            ImageView profileImage = (ImageView) header.findViewById(R.id.profile);
+            Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
+
+
+            txtInterests = (TextView) header.findViewById(R.id.txtInterests);
+            txtInterestsCount = (TextView) header.findViewById(R.id.txtInterestsCount);
+            txtPosts = (TextView) header.findViewById(R.id.txtPosts);
+            txtPostsCount = (TextView) header.findViewById(R.id.txtPostsCount);
 
             rootView.findViewById(R.id.showInterests).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -130,6 +197,15 @@ public class Me extends Fragment {
         }
 
         return rootView; //inflater.inflate(R.layout.activity_me, container, false);
+    }
+
+    /**
+     * This method is called when swipe refresh is pulled down
+     */
+    @Override
+    public void onRefresh() {
+        // TODO: geht irgendwie nicht im zusammenhang mit dem cell swipe...deswegen erstmal auskommentiert
+        refreshInterests();
     }
 
     /*@Override
@@ -174,8 +250,28 @@ public class Me extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
+        if (isVisibleToUser && sharedpreferences.contains("loggedin")) {
             Log.d(TAG, "ME SCREEN APPEARED");
+
+            realm = Realm.getInstance(context);
+
+            // Build the query looking at all users:
+            RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+            // Execute the query:
+            RealmResults<CDUser> result = query.findAll();
+
+            getActivity().setTitle(result.first().getFirst_name());
+
+            final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtInterestsCount);
+            textViewToChange.setText(""+getNumberOfInterestPosts());
+
+            final TextView ownPosts = (TextView) rootView.findViewById(R.id.txtPostsCount);
+            ownPosts.setText(""+getNumberOfOwnPosts());
+
+            displayInterests();
+
+            //getActivity().setTitle("Me");
         } else {
             Log.d(TAG, "ME SCREEN DISAPPEARED");
         }
@@ -185,47 +281,48 @@ public class Me extends Fragment {
     void displayInterests() {
         //frame.removeAllViews();
 
-        //View view = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.me_interests, frame, false);// .getSystemService("layout_inflater")).inflate(0x7f030011, frame, false);
+        //View view = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.listview_quickpost, frame, false);// .getSystemService("layout_inflater")).inflate(0x7f030011, frame, false);
 
-        ListView myListView = (ListView) rootView.findViewById(R.id.listView);
-        ListViewAdapter emptyAdapter = new ListViewAdapter(getActivity(), R.layout.me_interests, new ArrayList<String>());
-        myListView.setAdapter(emptyAdapter);
-        ArrayList<String> myStringArray1 = new ArrayList<String>();
-        for (int l=0;l<5;l++) {
-            myStringArray1.add("something");
+        /*ListView myListView = (ListView) rootView.findViewById(R.id.listView);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        /*swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+
+                                        refreshInterests();
+                                    }
+                                }
+        );*/
+
+        realm = Realm.getInstance(context);
+
+        RealmQuery<CDPost> query = realm.where(CDPost.class);
+
+        query.equalTo("isOwn", 0);
+
+        // Execute the query:
+        RealmResults<CDPost> result = query.findAll();
+
+        result.sort("last_updated", RealmResults.SORT_ORDER_DESCENDING);
+
+        listViewPosts.clear();
+
+        for (int l=0;l<result.size();l++) {
+            listViewPosts.add(result.get(l));
         }
 
-        ListViewAdapter adapter = new ListViewAdapter(getActivity(), R.layout.me_interests, myStringArray1);
-        myListView.setAdapter(adapter);
+        //myListView.invalidateViews();
 
-
-        myListView.setOnItemClickListener(
-                new AdapterView.OnItemClickListener()
-                {
-                    @Override
-                    public void onItemClick(AdapterView<?> arg0, View view,
-                                            int position, long id) {
-
-                        /*FragmentManager fragmentManager = getFragmentManager();
-                        fragmentManager.beginTransaction()
-                                                        .replace(R.id.meLayout, new ItemListFragment())
-                                                        .commit();*/
-                        Log.d(TAG, "item clicked!");
-
-                        //Take action here.
-                    }
-                }
-        );
-        //view.startAnimation(AnimationUtils.loadAnimation(getActivity(), 0x7f040002));
-
-        //rootView.inflate(R.layout.me_interests, frame, false);
-        //rootView = rootView.inflate(App.context, R.layout.me_interests, frame);
-
-        //View view = rootView.findViewById(R.id.interestList);
-        //view.startAnimation(AnimationUtils.loadAnimation(getActivity()), );
-        //View view = ((LayoutInflater)getActivity().getSystemService("layout_inflater")).inflate(0x7f030011, frame, false);
-        //view.startAnimation(AnimationUtils.loadAnimation(getActivity(), 0x7f040002));
-
+        //adapter.clear();
+        //adapter.addAll(listViewPosts);
+        adapter.notifyDataSetChanged();
 
         //frame.addView(myListView);
         interestsSelected();
@@ -234,24 +331,29 @@ public class Me extends Fragment {
 
     void displayOwnPosts() {
 
-        /*frame.removeAllViews();
+        realm = Realm.getInstance(context);
 
-        View view = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.me_posts, frame, false);
-        View view2 = ((LayoutInflater) getActivity().getSystemService("layout_inflater")).inflate(R.layout.me_posts, frame, false);
+        RealmQuery<CDPost> query = realm.where(CDPost.class);
 
-        frame.addView(view);
-        frame.addView(view2);*/
+        query.equalTo("isOwn", 1);
 
-        ListView myListView = (ListView) rootView.findViewById(R.id.listView);
-        ListViewAdapter emptyAdapter = new ListViewAdapter(getActivity(), R.layout.me_interests, new ArrayList<String>());
-        myListView.setAdapter(emptyAdapter);
-        ArrayList<String> myStringArray1 = new ArrayList<String>();
-        for (int l=0;l<3;l++) {
-            myStringArray1.add("something");
+        // Execute the query:
+        RealmResults<CDPost> result = query.findAll();
+
+        result.sort("last_updated", RealmResults.SORT_ORDER_DESCENDING);
+
+        listViewPosts.clear();
+        for (int l=0;l<result.size();l++) {
+            listViewPosts.add(result.get(l));
         }
 
-        ListViewAdapter adapter = new ListViewAdapter(getActivity(), R.layout.me_interests, myStringArray1);
-        myListView.setAdapter(adapter);
+        //myListView.invalidateViews();
+        //adapter.clear();
+        //adapter.addAll(listViewPosts);
+        adapter.notifyDataSetChanged();
+
+        //View header = getActivity().getLayoutInflater().inflate(R.layout.me_header, null);
+        //myListView.addHeaderView(header);
 
         ownPostsSelected();
     }
@@ -278,6 +380,46 @@ public class Me extends Fragment {
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
         inflater.inflate(R.menu.menu_tabbar, menu);
+    }
+
+    public int getNumberOfOwnPosts() {
+        Realm realm = Realm.getInstance(context);
+
+        // Build the query looking at all users:
+        RealmQuery<CDPost> query = realm.where(CDPost.class);
+        query.equalTo("isOwn", 1);
+
+        // Execute the query:
+        RealmResults<CDPost> result = query.findAll();
+
+        return result.size();
+    }
+
+    public int getNumberOfInterestPosts() {
+        Realm realm = Realm.getInstance(context);
+
+        // Build the query looking at all users:
+        RealmQuery<CDPost> query = realm.where(CDPost.class);
+        query.equalTo("isOwn", 0);
+
+        // Execute the query:
+        RealmResults<CDPost> result = query.findAll();
+
+        return result.size();
+    }
+
+    public void updateInterests() {
+        final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtInterestsCount);
+        textViewToChange.setText(""+getNumberOfInterestPosts());
+    }
+
+    public void refreshInterests() {
+        swipeRefreshLayout.setRefreshing(true);
+
+        // Do refresh from server
+
+
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 }

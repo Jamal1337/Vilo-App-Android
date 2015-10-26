@@ -43,7 +43,7 @@ public class PersistentCookieStore implements CookieStore {
             + SP_KEY_DELIMITER;
     private SharedPreferences sharedPreferences;
 
-    // In memory‘
+    // In memory
     private Map<URI, Set<HttpCookie>> allCookies;
 
     public PersistentCookieStore(Context context) {

@@ -1,10 +1,14 @@
 package com.fabian.vilo;
 
+import com.fabian.vilo.cards.EventpostCard;
+import com.fabian.vilo.cards.PostLocation;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Fabian on 11/10/15.
@@ -32,9 +36,10 @@ public class Card {
     public String last_updated;
     public int isAttended;
     public int topTip;
+    public List<PostLocation> location;
 
     public Card(String title, String text, int postid, int type, int category, int commentCount, int interestCount, String timeAgo, String distance, String username, String attachment, String timestamp,
-    int userid, String photo, float latitude, float longitude, int radius, String event_date, int location_id, String last_updated, int isAttended, int topTip) {
+    int userid, String photo, float latitude, float longitude, int radius, String event_date, int location_id, String last_updated, int isAttended, int topTip, List<PostLocation> location) {
         this.title = title;
         this.text = text;
         this.postid = postid;
@@ -57,6 +62,7 @@ public class Card {
         this.last_updated = last_updated;
         this.isAttended = isAttended;
         this.topTip = topTip;
+        this.location = location;
 
     }
 

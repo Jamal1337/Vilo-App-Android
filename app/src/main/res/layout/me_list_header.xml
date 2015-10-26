@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/containerTop"
+    android:background="@drawable/me_bg"
+    android:paddingTop="10.0dip"
+    android:layout_width="fill_parent"
+    android:layout_height="160.0dip"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/profile"
+        app:civ_border_width="2dp"
+        app:civ_border_color="#FFFFFF"
+        android:layout_width="70.0dip"
+        android:layout_height="70.0dip"
+        android:src="@drawable/fb"
+        android:layout_centerHorizontal="true"
+        style="?android:attr/borderlessButtonStyle" />
+    <LinearLayout android:gravity="center" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_below="@id/profile">
+        <LinearLayout android:gravity="right" android:id="@+id/btnInterests" android:paddingTop="15.0dip" android:paddingBottom="15.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_weight="0.45">
+            <LinearLayout android:gravity="left" android:id="@+id/showInterests" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:clickable="true">
+                <TextView android:textColor="@color/pink" android:id="@+id/txtInterestsCount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1" android:layout_below="@id/profile" />
+                <TextView android:textColor="@color/pink" android:id="@+id/txtInterests" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Interests" android:layout_below="@id/profile" />
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:gravity="center" android:paddingTop="20.0dip" android:paddingBottom="20.0dip" android:layout_width="0.0dip" android:layout_height="100dp" android:layout_weight="0.1">
+            <View android:background="#ffffffff" android:layout_width="1.0dip" android:layout_height="50dp" />
+        </LinearLayout>
+        <LinearLayout android:gravity="left" android:id="@+id/btnPosts" android:paddingTop="15.0dip" android:paddingBottom="15.0dip" android:layout_width="0.0dip" android:layout_height="wrap_content" android:layout_weight="0.45">
+            <LinearLayout android:gravity="left" android:id="@+id/showPosts" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:clickable="true">
+                <TextView android:id="@+id/txtPostsCount" android:textColor="@color/white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4" android:layout_below="@id/profile" />
+                <TextView android:id="@+id/txtPosts" android:textColor="@color/white" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Posts" android:layout_below="@id/profile" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
