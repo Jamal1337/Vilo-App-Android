@@ -1,7 +1,6 @@
-package com.fabian.vilo;
+package com.fabian.vilo.upload_views.me_screen;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;

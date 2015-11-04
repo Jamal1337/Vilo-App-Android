@@ -2,28 +2,23 @@
 // Jad home page: http://www.geocities.com/kpdus/jad.html
 // Decompiler options: braces fieldsfirst space lnc 
 
-package com.fabian.vilo;
+package com.fabian.vilo.upload_views.me_screen;
 
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.FragmentManager;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.fabian.vilo.R;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

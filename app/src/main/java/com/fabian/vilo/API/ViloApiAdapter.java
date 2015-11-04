@@ -1,13 +1,8 @@
-package com.fabian.vilo;
-
-import com.fabian.vilo.cards.Deserializer;
+package com.fabian.vilo.API;
 
 import android.content.Context;
 import android.util.Log;
 
-import com.fabian.vilo.cards.EventpostCard;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -17,10 +12,8 @@ import com.squareup.okhttp.ResponseBody;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.util.List;
 
 import okio.Buffer;
-import retrofit.Callback;
 
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;

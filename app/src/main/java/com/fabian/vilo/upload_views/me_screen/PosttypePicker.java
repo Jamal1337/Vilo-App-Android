@@ -1,4 +1,4 @@
-package com.fabian.vilo;
+package com.fabian.vilo.upload_views.me_screen;
 
 import android.app.Dialog;
 import android.content.Context;

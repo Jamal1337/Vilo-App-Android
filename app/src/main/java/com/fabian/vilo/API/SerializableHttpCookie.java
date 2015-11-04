@@ -1,4 +1,4 @@
-package com.fabian.vilo;
+package com.fabian.vilo.API;
 
 /*
  * Copyright (c) 2011 James Smith <james@loopj.com>

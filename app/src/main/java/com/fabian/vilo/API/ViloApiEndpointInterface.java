@@ -1,4 +1,4 @@
-package com.fabian.vilo;
+package com.fabian.vilo.API;
 
 import com.fabian.vilo.cards.EventpostCard;
 import com.fabian.vilo.cards.Posts;
