@@ -1,4 +1,4 @@
-package com.fabian.vilo;
+package com.fabian.vilo.custom_methods;
 
 import java.util.Locale;
 

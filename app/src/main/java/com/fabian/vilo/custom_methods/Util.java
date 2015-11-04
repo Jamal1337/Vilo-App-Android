@@ -1,31 +1,14 @@
-package com.fabian.vilo;
+package com.fabian.vilo.custom_methods;
 
 /**
  * Created by Fabian on 10/10/15.
  */
 
-import android.app.Application;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.DisplayMetrics;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Bitmap.Config;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.PorterDuff.Mode;
 import android.util.Log;
-import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
-import android.util.AttributeSet;
-import android.graphics.drawable.BitmapDrawable;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

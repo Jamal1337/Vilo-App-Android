@@ -8,39 +8,46 @@
 
     <application
         android:allowBackup="true"
+        android:debuggable="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:debuggable="true"
         android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
-
-        <activity android:name="com.facebook.FacebookActivity"
-            android:configChanges=
-                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            />
-
-        <activity  android:name=".Login" android:screenOrientation="portrait" />
-
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".Login"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Tabbar"
             android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AroundMe" android:screenOrientation="portrait" >
+        <activity
+            android:name=".around_me_screen.AroundMe"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name=".Me" android:screenOrientation="portrait" >
+        <activity
+            android:name=".me_screen.Me"
+            android:screenOrientation="portrait" >
         </activity>
-        <activity android:name=".Quickpost" android:screenOrientation="portrait" >
+        <activity
+            android:name=".upload_views.Quickpost"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 

@@ -1,19 +1,17 @@
-package com.fabian.vilo;
+package com.fabian.vilo.me_screen;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.net.Uri;
-import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentManager.OnBackStackChangedListener;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +27,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import android.widget.ListView;
 
+import com.fabian.vilo.CustomViewPager;
+import com.fabian.vilo.Tabbar;
+import com.fabian.vilo.detail_views.QuickpostDetail;
+import com.fabian.vilo.R;
+import com.fabian.vilo.adapters.ListViewAdapter;
 import com.fabian.vilo.models.CDModels.CDPost;
 import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
@@ -67,7 +70,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
         super.onCreate(savedInstanceState);
 
-        rootView = inflater.inflate(R.layout.activity_me_2, container, false);
+        rootView = inflater.inflate(R.layout.activity_me, container, false);
 
         sharedpreferences = getContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
 
@@ -127,30 +130,28 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
                         public void onItemClick(AdapterView<?> arg0, View view,
                                                 int position, long id) {
 
-                        /*FragmentManager fragmentManager = getFragmentManager();
-                        fragmentManager.beginTransaction()
-                                                        .replace(R.id.meLayout, new ItemListFragment())
-                                                        .commit();*/
-                            Log.d(TAG, "item at row "+position+" clicked!");
-                            Log.d(TAG, "title of cell: "+listViewPosts.get(position-1).getTitle());
+                            Log.d(TAG, "item at row " + position + " clicked!");
+                            Log.d(TAG, "title of cell: " + listViewPosts.get(position - 1).getTitle());
 
-                            // Go to Detail Activity
-                        /*Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                        // Send the position number to Detail Activity too.
-                        i.putExtra("position", position);
-                        // Run the process
-                        startActivity(i);*/
+                            ((Tabbar) getActivity()).findViewById(R.id.tab_layout).setVisibility(View.GONE);
+                            ((Tabbar) getActivity()).findViewById(R.id.fab).setVisibility(View.GONE);
 
-                            /*Intent detailIntent = new Intent(context, QuickpostDetail.class);
-                            detailIntent.putExtra(QuickpostDetail.ARG_ITEM_ID, id);
-                            startActivity(detailIntent);*/
+                            CustomViewPager pager = (CustomViewPager)((Tabbar) getActivity()).findViewById(R.id.pager);
+                            pager.setSwipeable(false);
 
-                            //Take action here.
+                            QuickpostDetail quickpostDetail = new QuickpostDetail();
+                            quickpostDetail.setTitle(getActivity().getTitle().toString());
+                            quickpostDetail.setPost(listViewPosts.get(position-1));
+                            Fragment fragment = quickpostDetail;
 
-                            android.support.v4.app.Fragment detail = new QuickpostDetail();
-                            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                            fragmentManager.beginTransaction().replace(R.id.containerMe, detail).addToBackStack("back").commit();
-                            //fragmentManager.beginTransaction().add(R.id.listView, detail).addToBackStack("back").commit();
+                            FragmentManager manager = ((Tabbar)getActivity()).getSupportFragmentManager();
+                            FragmentTransaction transaction = manager.beginTransaction(); //getParentFragment().getFragmentManager().beginTransaction();// manager.beginTransaction();
+                            transaction.addToBackStack(null);
+                            //transaction.hide(Me.this);
+                            transaction.replace(R.id.main_layout, fragment); // newInstance() is a static factory method.
+                            transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                            transaction.commit();
+
                         }
                     }
             );
@@ -190,7 +191,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
             Log.d(TAG, "bla" + frame);
 
-            displayInterests();
+            //displayInterests();
 
             setHasOptionsMenu(true);
 
@@ -343,7 +344,10 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         result.sort("last_updated", RealmResults.SORT_ORDER_DESCENDING);
 
         listViewPosts.clear();
+        Log.d(TAG, "post array size: "+listViewPosts.size());
         for (int l=0;l<result.size();l++) {
+            Log.d(TAG, "post title: "+result.get(l).getTitle());
+            Log.d(TAG, "post image: "+result.get(l).getImgURL());
             listViewPosts.add(result.get(l));
         }
 
@@ -375,7 +379,9 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menu.add("Radius")
+        MenuItem item = menu.add("Settings");
+
+        item
                 .setIcon(R.drawable.nav_settings)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 

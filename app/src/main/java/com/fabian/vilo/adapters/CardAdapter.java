@@ -1,7 +1,6 @@
-package com.fabian.vilo;
+package com.fabian.vilo.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.fabian.vilo.around_me_screen.Card;
+import com.fabian.vilo.R;
+import com.fabian.vilo.custom_methods.ImageDownloader;
 
 import java.util.ArrayList;
 

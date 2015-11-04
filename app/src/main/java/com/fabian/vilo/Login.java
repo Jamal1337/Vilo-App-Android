@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
+import com.fabian.vilo.api.ViloApiAdapter;
+import com.fabian.vilo.api.ViloApiEndpointInterface;
+import com.fabian.vilo.around_me_screen.AroundMe;
 import com.fabian.vilo.models.CDModels.ModelManager;
 import com.fabian.vilo.models.FbUserAuth;
 import com.fabian.vilo.models.User;

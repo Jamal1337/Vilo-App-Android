@@ -1,13 +1,16 @@
-package com.fabian.vilo;
+package com.fabian.vilo.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
+import com.fabian.vilo.api.ViloApiAdapter;
+import com.fabian.vilo.api.ViloApiEndpointInterface;
+import com.fabian.vilo.around_me_screen.Card;
+import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.cards.EventpostCard;
 import com.fabian.vilo.cards.PostLocation;
-import com.fabian.vilo.cards.Posts;
 import com.fabian.vilo.cards.QuickpostCard;
 
 import java.util.ArrayList;

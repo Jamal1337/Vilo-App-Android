@@ -1,4 +1,4 @@
-package com.fabian.vilo;
+package com.fabian.vilo.around_me_screen;
 
 import com.fabian.vilo.cards.EventpostCard;
 import com.fabian.vilo.cards.PostLocation;

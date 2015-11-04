@@ -2,17 +2,10 @@
 // Jad home page: http://www.geocities.com/kpdus/jad.html
 // Decompiler options: braces fieldsfirst space lnc 
 
-package com.fabian.vilo;
+package com.fabian.vilo.around_me_screen;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.ColorDrawable;
-import android.util.TypedValue;
-import android.view.View;
-import android.view.Window;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 
 public class SetRadius extends Dialog

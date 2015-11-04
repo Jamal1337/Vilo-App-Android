@@ -1,11 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/darker_gray"
+    android:weightSum="1">
 
+    <!--<fragment
+        android:name="com.fabian.vilo.MessagesFragment"
+        android:id="@+id/msg_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1" />-->
     <ListView
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/detailistView"
+        android:layout_weight="0.91"
+        android:background="#ffffff" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/listView2"
-        android:layout_gravity="center_horizontal" />
+        android:background="#dedede" >
+        <Button
+            android:id="@+id/send_btn"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:textColor="#000"
+            android:text="@string/send" />
+        <EditText
+            android:id="@+id/msg_edit"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_alignBottom="@+id/send_btn"
+            android:layout_toLeftOf="@+id/send_btn"
+            android:textColor="#000000"
+            android:background="#fff"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="3dp"
+            android:ellipsize="end"
+            android:hint="@string/makeComment"
+            android:textColorHint="#7d7d7d">
+        </EditText>
+    </RelativeLayout>
+
 </LinearLayout>

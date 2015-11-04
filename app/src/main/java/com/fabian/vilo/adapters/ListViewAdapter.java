@@ -1,4 +1,4 @@
-package com.fabian.vilo;
+package com.fabian.vilo.adapters;
 
 import java.util.ArrayList;
 
@@ -15,6 +15,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.fabian.vilo.me_screen.Me;
+import com.fabian.vilo.R;
+import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.models.CDModels.CDPost;
 import com.squareup.picasso.Picasso;
 
@@ -50,6 +53,7 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
         // Get the data item_event for this position
         post = getItem(position);
 
+        convertView = null;
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
         if (convertView == null) {
@@ -58,7 +62,8 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
 
             switch (post.getType()) {
                 case 0:
-                    if (post.getImgURL() != "") {
+                    Log.d("bla", "title is quick: "+post.getTitle());
+                    if (post.getImgURL().trim().length() > 0) {
                         convertView = inflater.inflate(R.layout.listview_quickpost, null);
                         viewHolder.swipeImage = (ImageView) convertView.findViewById(R.id.swipeImage);
                     } else {
@@ -66,6 +71,7 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
                     }
                     break;
                 case 1:
+                    Log.d("bla", "title is event: "+post.getTitle());
                     convertView = inflater.inflate(R.layout.listview_eventpost, null);
                     viewHolder.swipeImage = (ImageView) convertView.findViewById(R.id.swipeImage);
                     break;
@@ -123,9 +129,11 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
         if(post != null) {
 
             Log.d("bla", "fetched image: "+post.getImgURL());
+            Log.d("bla", "fetched title: "+post.getTitle());
+            Log.d("bla", "fetched type: "+post.getType());
 
             if (post.getType() == 0) {
-                if (post.getImgURL() != "") {
+                if (post.getImgURL().trim().length() > 0) {
                     //new ImageDownloader(viewHolder.swipeImage).execute(post.getImgURL());
                     Picasso.with(context)
                             .load(post.getImgURL())

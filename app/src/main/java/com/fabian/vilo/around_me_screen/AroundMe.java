@@ -1,19 +1,14 @@
-package com.fabian.vilo;
+package com.fabian.vilo.around_me_screen;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.BitmapDrawable;
-import android.hardware.SensorManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,42 +16,46 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.fabian.vilo.CustomViewPager;
+import com.fabian.vilo.Tabbar;
+import com.fabian.vilo.api.ViloApiAdapter;
+import com.fabian.vilo.api.ViloApiEndpointInterface;
+import com.fabian.vilo.adapters.CardAdapter;
+import com.fabian.vilo.adapters.CardManager;
+import com.fabian.vilo.custom_methods.GPSTracker;
+import com.fabian.vilo.custom_methods.UnitLocale;
+import com.fabian.vilo.custom_methods.Util;
+import com.fabian.vilo.Login;
+import com.fabian.vilo.R;
 import com.fabian.vilo.cards.EventpostCard;
 import com.fabian.vilo.cards.PostLocation;
 import com.fabian.vilo.cards.Posts;
 import com.fabian.vilo.cards.QuickpostCard;
+import com.fabian.vilo.detail_views.QuickpostDetail;
 import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
 import com.fabian.vilo.models.FbUserAuth;
 import com.fabian.vilo.models.User;
 import com.fabian.vilo.models.ViloResponse;
 import com.facebook.AccessToken;
-import com.google.gson.Gson;
 import com.skyfishjy.library.RippleBackground;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.squareup.picasso.Picasso;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import android.util.Log;
 import android.content.Context;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.w3c.dom.Text;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -69,8 +68,6 @@ import retrofit.Retrofit;
 public class AroundMe extends Fragment {
 
     private static final String TAG = AroundMe.class.getSimpleName();
-
-    public static final String BASE_URL = "https://api.viloapp.com/v1/";
 
     private Context context;
     private ViloApiAdapter viloAdapter;
@@ -92,20 +89,14 @@ public class AroundMe extends Fragment {
     private int cardCount;
     private int totalPosts = 0;
 
-    //private ArrayList<Map<String, Integer>> swipedPosts;
     private ArrayList swipedPosts = new ArrayList();
 
     ModelManager modelManager;
 
     SharedPreferences sharedpreferences;
 
-    //private ArrayList<Productp> al;
-    //private ArrayAdapter<Productp> arrayAdapter;
-
     SwipeFlingAdapterView flingContainer;
     View rootView;
-
-    JSONArray products = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -114,8 +105,6 @@ public class AroundMe extends Fragment {
 
         //SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         //boolean cbValue = sp.getBoolean("CHECKBOX", false);
-
-
 
         //SharedPreferences preferences = context.getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
         //SharedPreferences.Editor editor = preferences.edit();
@@ -263,28 +252,31 @@ public class AroundMe extends Fragment {
 
     @Override
     public void onResume() {
+        // TODO: wird aufgerufen wenn man im upload screen ist und mitm image picker ein bild ausgewählt hat
         super.onResume();
-        getActivity().setTitle("Around Me");
-        if(sharedpreferences.contains("loggedin")){
-            Log.d(TAG, "logged in pref is set");
-            Log.d(TAG, "loggin status: " + sharedpreferences.getBoolean("loggedin", true));
+        if (((Tabbar) getActivity()).getIsVisible() == true) {
+            getActivity().setTitle("Around Me");
+            if (sharedpreferences.contains("loggedin")) {
+                Log.d(TAG, "logged in pref is set");
+                Log.d(TAG, "loggin status: " + sharedpreferences.getBoolean("loggedin", true));
 
-            Realm realm = Realm.getInstance(context);
-            // Build the query looking at all users:
-            RealmQuery<CDUser> query = realm.where(CDUser.class);
+                Realm realm = Realm.getInstance(context);
+                // Build the query looking at all users:
+                RealmQuery<CDUser> query = realm.where(CDUser.class);
 
-            // Execute the query:
-            RealmResults<CDUser> result = query.findAll();
+                // Execute the query:
+                RealmResults<CDUser> result = query.findAll();
 
-            Log.d(TAG, "userinfo: " + result.first().getFirst_name());
+                Log.d(TAG, "userinfo: " + result.first().getFirst_name());
 
-            fetchPosts(rootView);
+                fetchPosts(rootView);
 
 
-        } else {
-            Log.d(TAG, "logged in pref is not set");
-            Intent intent = new Intent(getActivity(), Login.class);
-            startActivity(intent);
+            } else {
+                Log.d(TAG, "logged in pref is not set");
+                Intent intent = new Intent(getActivity(), Login.class);
+                startActivity(intent);
+            }
         }
     }
 
@@ -564,6 +556,26 @@ public class AroundMe extends Fragment {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
                 Log.d("LIST", "Clicked!");
+                Card clickedCard = (Card) dataObject;
+
+                ((Tabbar) getActivity()).findViewById(R.id.tab_layout).setVisibility(View.GONE);
+                ((Tabbar) getActivity()).findViewById(R.id.fab).setVisibility(View.GONE);
+
+                CustomViewPager pager = (CustomViewPager)((Tabbar) getActivity()).findViewById(R.id.pager);
+                pager.setSwipeable(false);
+
+                QuickpostDetail quickpostDetail = new QuickpostDetail();
+                quickpostDetail.setTitle(getActivity().getTitle().toString());
+                quickpostDetail.setCard(clickedCard);
+                Fragment fragment = quickpostDetail;
+
+                FragmentManager manager = ((Tabbar)getActivity()).getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction(); //getParentFragment().getFragmentManager().beginTransaction();// manager.beginTransaction();
+                transaction.addToBackStack(null);
+                transaction.hide(AroundMe.this);
+                transaction.replace(R.id.main_layout, fragment); // newInstance() is a static factory method.
+                transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                transaction.commit();
             }
         });
 
@@ -579,9 +591,13 @@ public class AroundMe extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        menu.add("Radius")
+        MenuItem item = menu.add("Radius");
+
+        item
                 .setIcon(R.drawable.nav_radius)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+        Log.d(TAG, "navigation item id: "+item.getItemId());
 
         inflater.inflate(R.menu.menu_tabbar, menu);
     }
@@ -785,6 +801,8 @@ public class AroundMe extends Fragment {
                 // alert no internet
             }
 
+        } else {
+            fetchPosts(rootView);
         }
     }
 

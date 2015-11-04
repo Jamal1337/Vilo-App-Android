@@ -3,47 +3,32 @@ package com.fabian.vilo;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.util.Log;
 
-import android.widget.TableLayout;
-import android.widget.TextView;
-
-import android.app.FragmentTransaction;
-
-import android.app.AlertDialog;
-import android.view.WindowManager;
-
-import android.view.animation.AnimationUtils;
-import android.view.animation.Animation;
-
-import com.fabian.vilo.models.CDModels.CDUser;
+import com.fabian.vilo.adapters.PagerAdapter;
+import com.fabian.vilo.upload_views.NewQuickpost;
+import com.fabian.vilo.upload_views.Quickpost;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 
 import java.net.CookieHandler;
 import java.net.CookiePolicy;
 
-import io.realm.Realm;
-import io.realm.RealmQuery;
-import io.realm.RealmResults;
-
 public class Tabbar extends AppCompatActivity {
 
     private static final String TAG = Tabbar.class.getSimpleName();
+    private TabLayout tabLayout;
+    Boolean isVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,39 +44,7 @@ public class Tabbar extends AppCompatActivity {
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         CookieHandler.setDefault(cookieManager);
 
-        FloatingActionButton uploadBtn = (FloatingActionButton) findViewById(R.id.fab);
-
-        uploadBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Log.d(TAG, "btn pressed");
-
-
-                Intent i = new Intent(Tabbar.this, Quickpost.class);
-                startActivity(i);
-
-                /*FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
-                //fragmenttransaction.setCustomAnimations(0x7f040000, 0, 0, 0x7f040001);
-                fragmenttransaction.replace(R.layout.activity_around_me, Quickpost.newInstance(), "postFragment");
-                fragmenttransaction.addToBackStack(null);
-                fragmenttransaction.commit();*/
-
-
-                /*final AlertDialog dialog = new AlertDialog
-                        .Builder(Tabbar.this)
-                        .setTitle("GEILE APP DIGGA")
-                        .setPositiveButton("Close", null)
-                        .create();
-                dialog.getWindow().getAttributes().dimAmount = 0.5f;
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-
-                dialog.show();*/
-
-            }
-        });
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Around Me"));
         tabLayout.addTab(tabLayout.newTab().setText("Me"));
         //tabLayout.addTab(tabLayout.newTab().setText("Tab 3"));
@@ -99,7 +52,7 @@ public class Tabbar extends AppCompatActivity {
         tabLayout.setTabTextColors(getResources().getColor(R.color.colorPrimary), getResources().getColor(R.color.colorAccent));
         tabLayout.setSelectedTabIndicatorColor(getResources().getColor(R.color.colorAccent));
 
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        final ViewPager viewPager = (CustomViewPager) findViewById(R.id.pager);
         final PagerAdapter adapter = new PagerAdapter
                 (getSupportFragmentManager(), tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
@@ -120,6 +73,55 @@ public class Tabbar extends AppCompatActivity {
 
             }
         });
+
+        FloatingActionButton uploadBtn = (FloatingActionButton) findViewById(R.id.fab);
+
+        uploadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.d(TAG, "btn pressed");
+
+                // load quickpost upload
+
+                NewQuickpost newQuickpost = new NewQuickpost();
+                Fragment fragment = newQuickpost;
+
+                getSupportActionBar().hide();
+
+                Log.d(TAG, "activity: " + tabLayout.getSelectedTabPosition());
+                Log.d(TAG, "activity: " + tabLayout.getTabAt(0).getClass());
+                isVisible = false;
+
+                FragmentManager manager = getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction(); //getParentFragment().getFragmentManager().beginTransaction();// manager.beginTransaction();
+                transaction.addToBackStack(null);
+                transaction.replace(R.id.main_layout, fragment); // newInstance() is a static factory method.
+                transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                transaction.commit();
+
+                //Intent i = new Intent(Tabbar.this, Quickpost.class);
+                //startActivity(i);
+
+                /*FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
+                //fragmenttransaction.setCustomAnimations(0x7f040000, 0, 0, 0x7f040001);
+                fragmenttransaction.replace(R.layout.activity_around_me, Quickpost.newInstance(), "postFragment");
+                fragmenttransaction.addToBackStack(null);
+                fragmenttransaction.commit();*/
+
+
+                /*final AlertDialog dialog = new AlertDialog
+                        .Builder(Tabbar.this)
+                        .setTitle("GEILE APP DIGGA")
+                        .setPositiveButton("Close", null)
+                        .create();
+                dialog.getWindow().getAttributes().dimAmount = 0.5f;
+                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+
+                dialog.show();*/
+
+            }
+        });
     }
 
     @Override
@@ -133,7 +135,7 @@ public class Tabbar extends AppCompatActivity {
         return true;
     }
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
@@ -141,7 +143,7 @@ public class Tabbar extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @Override
     protected void onResume() {
@@ -157,5 +159,13 @@ public class Tabbar extends AppCompatActivity {
 
         // Logs 'app deactivate' App Event.
         AppEventsLogger.deactivateApp(this);
+    }
+
+    public Boolean getIsVisible() {
+        return isVisible;
+    }
+
+    public void setIsVisible(Boolean isVisible) {
+        this.isVisible = isVisible;
     }
 }

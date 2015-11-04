@@ -1,4 +1,4 @@
-package com.fabian.vilo;
+package com.fabian.vilo.custom_methods;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,7 +11,7 @@ import java.io.InputStream;
 /**
  * Created by Fabian on 22/10/15.
  */
-class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
+public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
     ImageView bmImage;
 
     public ImageDownloader(ImageView bmImage) {

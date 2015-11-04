@@ -6,8 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
-import com.fabian.vilo.Card;
-import com.fabian.vilo.cards.QuickpostCard;
+import com.fabian.vilo.around_me_screen.Card;
 import com.fabian.vilo.models.User;
 
 import java.io.ByteArrayOutputStream;
@@ -18,6 +17,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import retrofit.Response;
 
 /**
@@ -153,6 +154,55 @@ public class ModelManager {
             newPost.setLocation(location);
 
         }
+
+        realm.commitTransaction();
+
+        return true;
+    }
+
+    public boolean saveNewQuickPost(Card post, Context context) {
+
+        Uri myUri = Uri.parse(post.attachment);
+
+        byte[] inputData = convertImageToByte(myUri, context);
+
+        Realm realm = Realm.getInstance(context);
+
+        RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+        // Execute the query:
+        RealmResults<CDUser> result = query.findAll();
+
+        realm.beginTransaction();
+
+        CDPost newPost = realm.createObject(CDPost.class);
+        newPost.setAttachment(inputData);
+        newPost.setAttendentcount(0);
+        newPost.setCategory(post.category);
+        newPost.setComment(null);
+        newPost.setCommentcount(post.commentCount);
+        newPost.setEvent_date(post.event_date);
+        newPost.setHasReported(0);
+        newPost.setId(post.postid);
+        newPost.setImgURL(post.attachment);
+        newPost.setInterestcount(post.interestCount);
+        newPost.setIsNew(0);
+        newPost.setIsOwn(1);
+        newPost.setLast_updated(post.last_updated);
+        newPost.setLatitude(post.latitude);
+        newPost.setLongitude(post.longitude);
+        newPost.setLocation_id(post.location_id);
+        newPost.setPhoto(null);
+        newPost.setRadius(post.radius);
+        //newPost.setPoll();
+        newPost.setUser(result.first());
+        newPost.setUserid(post.userid);
+        newPost.setUsername(post.username);
+        newPost.setText(post.text);
+        newPost.setTitle(post.title);
+        newPost.setTimestamp(post.timestamp);
+        newPost.setTopTip(post.topTip);
+        newPost.setType(post.type);
 
         realm.commitTransaction();
 

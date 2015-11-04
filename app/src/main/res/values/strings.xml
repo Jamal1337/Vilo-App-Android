@@ -8,4 +8,8 @@
     <string name="facebook_app_id">1495136917391994</string>
     <string name="searchLabel">Searching for posts around you...</string>
     <string name="no_posts_found">No posts found.</string>
+    <string name="send">Send</string>
+    <string name="makeComment">Message</string>
+    <string name="uploadText">What\'s happening around you?</string>
+    <string name="uploadTitle">Title (max. 50 chars)</string>
 </resources>

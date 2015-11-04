@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FFFFFF"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:id="@+id/quickMainUserImage"
+            android:src="@drawable/v"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginLeft="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:text="Large Text"
+            android:id="@+id/quickMainTitle"
+            android:layout_gravity="center_horizontal"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@id/quickMainUserImage"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:textColor="#ff2b58"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:ellipsize="end"
+            android:singleLine="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/quickMainUsername"
+            android:layout_below="@+id/quickMainTitle"
+            android:layout_alignLeft="@+id/quickMainTitle"
+            android:layout_alignStart="@+id/quickMainTitle"
+            android:layout_marginTop="20dp"
+            android:textColor="#000"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/quickMainTime"
+            android:layout_alignTop="@+id/quickMainUsername"
+            android:layout_toRightOf="@+id/quickMainUsername"
+            android:layout_toEndOf="@+id/quickMainUsername"
+            android:layout_marginLeft="20dp"
+            android:textColor="#ff2b58" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="das ist ein geiler text man weiß garnicht was hier eigtl. geschrieben werden soll aber ich schreib einfach mal wild runter um zu schauen ob sich das textfeld erweitert oder auch nicht"
+            android:id="@+id/quickMainText"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="90dp"
+            android:textColor="#000000"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:id="@+id/quickMainImage"
+            android:src="@drawable/hafen"
+            android:layout_marginRight="10dp"
+            android:layout_below="@+id/quickMainText"
+            android:baselineAlignBottom="false"
+            android:clickable="true"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:layout_marginLeft="90dp" />
+    </RelativeLayout>
+
+</LinearLayout>
