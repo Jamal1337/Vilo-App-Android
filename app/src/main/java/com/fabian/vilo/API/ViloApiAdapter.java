@@ -1,4 +1,4 @@
-package com.fabian.vilo.API;
+package com.fabian.vilo.api;
 
 import android.content.Context;
 import android.util.Log;
@@ -30,7 +30,7 @@ public class ViloApiAdapter {
     private static ViloApiAdapter mInstance = null;
 
     protected Retrofit mRestAdapter;
-    protected ViloApiEndpointInterface mApi;
+    public ViloApiEndpointInterface mApi;
     static final String BASE_URL = "https://api.viloapp.com";
 
     private ViloApiAdapter(Context context) {

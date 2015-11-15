@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicBlur;
+//import android.renderscript.ScriptIntrinsicBlur;
 
 /**
  * Created by Fabian on 12/10/15.
@@ -22,12 +22,12 @@ public class BlurBuilder {
         Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
 
         RenderScript rs = RenderScript.create(context);
-        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+        //ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
         Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
         Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
-        theIntrinsic.setRadius(BLUR_RADIUS);
+        /*theIntrinsic.setRadius(BLUR_RADIUS);
         theIntrinsic.setInput(tmpIn);
-        theIntrinsic.forEach(tmpOut);
+        theIntrinsic.forEach(tmpOut);*/
         tmpOut.copyTo(outputBitmap);
 
         return outputBitmap;

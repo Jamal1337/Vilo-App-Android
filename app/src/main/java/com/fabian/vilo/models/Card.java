@@ -1,4 +1,4 @@
-package com.fabian.vilo.around_me_screen;
+package com.fabian.vilo.models;
 
 import com.fabian.vilo.cards.EventpostCard;
 import com.fabian.vilo.cards.PostLocation;
@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by Fabian on 11/10/15.
  */
-public class Card {
+public class Card implements WebPostInterface {
     public String title;
     public String text;
     public int postid;

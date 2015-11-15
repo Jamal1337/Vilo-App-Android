@@ -2,9 +2,10 @@
 // Jad home page: http://www.geocities.com/kpdus/jad.html
 // Decompiler options: braces fieldsfirst space lnc 
 
-package com.fabian.vilo.upload_views.me_screen;
+package com.fabian.vilo.upload_views;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;

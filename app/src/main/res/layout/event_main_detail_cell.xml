@@ -193,34 +193,49 @@
 
     </RelativeLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="das ist ein geiler text man weiß garnicht was hier eigtl. geschrieben werden soll aber ich schreib einfach mal wild runter um zu schauen ob sich das textfeld erweitert oder auch nicht"
-            android:id="@+id/quickMainText"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="90dp"
-            android:textColor="#000000"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp" />
+        <View
+            android:layout_width="2dp"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="42dp"
+            android:id="@+id/mainLine"
+            android:background="#000000" />
 
-        <ImageView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:id="@+id/quickMainImage"
-            android:src="@drawable/hafen"
-            android:layout_marginRight="10dp"
-            android:layout_below="@+id/quickMainText"
-            android:baselineAlignBottom="false"
-            android:clickable="true"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentStart="false"
-            android:layout_marginLeft="90dp" />
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="das ist ein geiler text man weiß garnicht was hier eigtl. geschrieben werden soll aber ich schreib einfach mal wild runter um zu schauen ob sich das textfeld erweitert oder auch nicht"
+                android:id="@+id/quickMainText"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="47dp"
+                android:textColor="#000000"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:autoLink="email|web"
+                android:textColorLink="#ff2b59" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:id="@+id/quickMainImage"
+                android:src="@drawable/hafen"
+                android:layout_marginRight="10dp"
+                android:layout_below="@+id/quickMainText"
+                android:baselineAlignBottom="false"
+                android:clickable="true"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentStart="false"
+                android:layout_marginLeft="47dp" />
+        </RelativeLayout>
+        </LinearLayout>
 
 </LinearLayout>

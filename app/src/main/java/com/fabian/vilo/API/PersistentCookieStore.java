@@ -1,4 +1,4 @@
-package com.fabian.vilo.API;
+package com.fabian.vilo.api;
 
 /*
  * Copyright (c) 2015 Fran Montiel

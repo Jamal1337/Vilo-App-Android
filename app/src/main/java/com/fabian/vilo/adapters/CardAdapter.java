@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.fabian.vilo.around_me_screen.Card;
+import com.fabian.vilo.models.Card;
 import com.fabian.vilo.R;
 import com.fabian.vilo.custom_methods.ImageDownloader;
 

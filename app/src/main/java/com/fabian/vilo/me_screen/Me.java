@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceFragment;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,22 +25,44 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import android.widget.ListView;
 
 import com.fabian.vilo.CustomViewPager;
+import com.fabian.vilo.Settings;
 import com.fabian.vilo.Tabbar;
+import com.fabian.vilo.api.ViloApiAdapter;
+import com.fabian.vilo.api.ViloApiEndpointInterface;
+import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.detail_views.QuickpostDetail;
 import com.fabian.vilo.R;
 import com.fabian.vilo.adapters.ListViewAdapter;
+import com.fabian.vilo.models.CDModels.CDComment;
 import com.fabian.vilo.models.CDModels.CDPost;
 import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
+import com.fabian.vilo.models.FbUserAuth;
+import com.fabian.vilo.models.UpdatePosts;
+import com.fabian.vilo.models.User;
+import com.fabian.vilo.models.ViloResponse;
+import com.facebook.AccessToken;
 import com.squareup.picasso.Picasso;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
@@ -62,6 +85,8 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private Context context;
+
+    private CDUser user;
 
     SharedPreferences sharedpreferences;
 
@@ -93,6 +118,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
             // Execute the query:
             RealmResults<CDUser> result = query.findAll();
 
+            user = result.first();
             //Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
 
             //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable)((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 180));
@@ -147,7 +173,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
                             FragmentManager manager = ((Tabbar)getActivity()).getSupportFragmentManager();
                             FragmentTransaction transaction = manager.beginTransaction(); //getParentFragment().getFragmentManager().beginTransaction();// manager.beginTransaction();
                             transaction.addToBackStack(null);
-                            //transaction.hide(Me.this);
+                            transaction.hide(Me.this);
                             transaction.replace(R.id.main_layout, fragment); // newInstance() is a static factory method.
                             transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                             transaction.commit();
@@ -315,9 +341,19 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
         listViewPosts.clear();
 
+        ArrayList<HashMap<String, String>> arrayList = new ArrayList<HashMap<String,String>>();
         for (int l=0;l<result.size();l++) {
+            HashMap<String, String> post = new HashMap<String, String>();
+            post.put("id", String.valueOf(result.get(l).getId()));
+            post.put("last_updated", result.get(l).getLast_updated());
+            post.put("comment_count", String.valueOf(result.get(l).getCommentcount()));
+
+            arrayList.add(post);
             listViewPosts.add(result.get(l));
         }
+
+        Map<String, ArrayList> checkPosts = new HashMap<String, ArrayList>();
+        checkPosts.put("data", arrayList);
 
         //myListView.invalidateViews();
 
@@ -327,6 +363,8 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
         //frame.addView(myListView);
         interestsSelected();
+
+        updatePosts(checkPosts, 0);
     }
 
 
@@ -344,12 +382,20 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         result.sort("last_updated", RealmResults.SORT_ORDER_DESCENDING);
 
         listViewPosts.clear();
-        Log.d(TAG, "post array size: "+listViewPosts.size());
+
+        ArrayList<HashMap<String, String>> arrayList = new ArrayList<HashMap<String,String>>();
         for (int l=0;l<result.size();l++) {
-            Log.d(TAG, "post title: "+result.get(l).getTitle());
-            Log.d(TAG, "post image: "+result.get(l).getImgURL());
+            HashMap<String, String> post = new HashMap<String, String>();
+            post.put("id", String.valueOf(result.get(l).getId()));
+            post.put("last_updated", result.get(l).getLast_updated());
+            post.put("comment_count", String.valueOf(result.get(l).getCommentcount()));
+
+            arrayList.add(post);
             listViewPosts.add(result.get(l));
         }
+
+        Map<String, ArrayList> checkPosts = new HashMap<String, ArrayList>();
+        checkPosts.put("data", arrayList);
 
         //myListView.invalidateViews();
         //adapter.clear();
@@ -360,6 +406,8 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         //myListView.addHeaderView(header);
 
         ownPostsSelected();
+
+        updatePosts(checkPosts, 1);
     }
 
     void interestsSelected() {
@@ -389,7 +437,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
     }
 
     public int getNumberOfOwnPosts() {
-        Realm realm = Realm.getInstance(context);
+        //Realm realm = Realm.getInstance(context);
 
         // Build the query looking at all users:
         RealmQuery<CDPost> query = realm.where(CDPost.class);
@@ -402,7 +450,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
     }
 
     public int getNumberOfInterestPosts() {
-        Realm realm = Realm.getInstance(context);
+        //Realm realm = Realm.getInstance(context);
 
         // Build the query looking at all users:
         RealmQuery<CDPost> query = realm.where(CDPost.class);
@@ -419,6 +467,11 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         textViewToChange.setText(""+getNumberOfInterestPosts());
     }
 
+    public void updateOwn() {
+        final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtPostsCount);
+        textViewToChange.setText("" + getNumberOfOwnPosts());
+    }
+
     public void refreshInterests() {
         swipeRefreshLayout.setRefreshing(true);
 
@@ -428,4 +481,200 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         swipeRefreshLayout.setRefreshing(false);
     }
 
+    public void updatePosts(final Map<String, ArrayList> pushPosts, final Integer isOwn) {
+        if (new Util().isNetworkAvailable(context) == true) {
+
+            ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(context);
+
+            ViloApiEndpointInterface apiService = viloAdapter.mApi;
+
+            Call<UpdatePosts> call = apiService.updatePosts(pushPosts);
+
+            call.enqueue(new Callback<UpdatePosts>() {
+                @Override
+                public void onResponse(Response<UpdatePosts> response, Retrofit retrofit) {
+
+                    Log.d(TAG, "response code: "+response.code());
+                    Log.d(TAG, "array: "+pushPosts);
+
+                    if (response.code() == 200) {
+
+                        Integer totalPosts = response.body().data.size();
+                        for (int j = 0; j < totalPosts; j++) {
+
+                            // check if some comments have been deleted, if so delete them in core data
+
+                            Log.d(TAG, "postid"+response.body().data.get(j).id);
+                            Log.d(TAG, "post deleted"+response.body().data.get(j).post_deleted);
+                            Log.d(TAG, "comments deleted"+response.body().data.get(j).deleted_comments);
+                            Log.d(TAG, "attendent"+response.body().data.get(j).attendentcount);
+                            Log.d(TAG, "lastupdated"+response.body().data.get(j).last_updated);
+                            Log.d(TAG, "followers"+response.body().data.get(j).followers);
+                            Log.d(TAG, "main deleted"+response.body().data.get(j).maindeleted);
+                            Log.d(TAG, "userid"+response.body().data.get(j).userid);
+                            Log.d(TAG, "comment count: "+response.body().data.get(j).commentcount);
+
+                            if (response.body().data.get(j).deleted_comments != null) {
+
+                                for (int z=0; z < response.body().data.get(j).deleted_comments.size(); z++) {
+                                    CDComment toEdit = realm.where(CDComment.class)
+                                            .equalTo("commentid", response.body().data.get(j).deleted_comments.get(z)).findFirst();
+                                    realm.beginTransaction();
+                                    toEdit.removeFromRealm();
+                                    realm.commitTransaction();
+                                }
+
+                            }
+
+                            CDPost post = realm.where(CDPost.class).equalTo("id", response.body().data.get(j).id).findFirst();
+                            realm.beginTransaction();
+
+                            if (post != null) {
+                                // check if main photo of photo album has been deleted
+                                if (post.getType() == 3) {
+                                    if (response.body().data.get(j).maindeleted == 1) {
+                                        post.setAttachment(null);
+                                        post.setImgURL("");
+                                    }
+                                }
+
+                                // check if whole post has been deleted, if so remove user and image from main post
+                                if (response.body().data.get(j).post_deleted == 1) {
+                                    post.setUserid(1);
+                                    post.setAttachment(null);
+                                    post.setImgURL("");
+                                }
+
+                                // check if meet post attendents have changed
+                                if (post.getType() == 4) {
+                                    if (post.getAttendentcount() != response.body().data.get(j).attendentcount) {
+                                        post.setAttendentcount(response.body().data.get(j).attendentcount);
+                                    }
+                                }
+
+                                // check if likes differ from current one, if so => update
+                                if (post.getInterestcount() != response.body().data.get(j).followers) {
+                                    post.setInterestcount(response.body().data.get(j).followers);
+                                }
+
+                                // if there are new comments and the last comment has not been made by the user himself, set the post to new comments available
+
+                                if (response.body().data.get(j).commentcount != null) {
+                                    if (Integer.parseInt(response.body().data.get(j).commentcount) > post.getCommentcount()) {
+                                        post.setCommentcount(Integer.parseInt(response.body().data.get(j).commentcount));
+                                        if (response.body().data.get(j).userid != user.getUserid()) {
+                                            post.setIsNew(1);
+                                        } else {
+                                            post.setIsNew(0);
+                                        }
+                                    } else if (Integer.parseInt(response.body().data.get(j).commentcount) < post.getCommentcount()) {
+                                        post.setCommentcount(Integer.parseInt(response.body().data.get(j).commentcount));
+                                    }
+                                }
+                                if (response.body().data.get(j).last_updated != null) {
+                                    if (response.body().data.get(j).last_updated != post.getTimestamp()) {
+                                        post.setLast_updated(response.body().data.get(j).last_updated);
+                                    }
+                                }
+
+                            }
+
+                            realm.commitTransaction();
+
+                        }
+
+                        // reload posts and table
+                        RealmQuery<CDPost> query = realm.where(CDPost.class);
+
+                        query.equalTo("isOwn", isOwn);
+
+                        // Execute the query:
+                        RealmResults<CDPost> result = query.findAll();
+
+                        result.sort("last_updated", RealmResults.SORT_ORDER_DESCENDING);
+
+                        listViewPosts.clear();
+
+                        for (int l=0;l<result.size();l++) {
+                            listViewPosts.add(result.get(l));
+                        }
+
+                        adapter.notifyDataSetChanged();
+
+                        if (isOwn == 1) {
+                            ownPostsSelected();
+                        } else {
+                            interestsSelected();
+                        }
+
+                    } else if (response.code() == 401) {
+                        // reauth
+                        ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(context);
+
+                        ViloApiEndpointInterface apiService = viloAdapter.mApi;
+
+                        String locale = context.getResources().getConfiguration().locale.getCountry();
+                        FbUserAuth userAuth = new FbUserAuth();
+                        userAuth.interests_push = 0;
+                        userAuth.own_push = 1;
+                        userAuth.origin = locale;
+                        userAuth.token = AccessToken.getCurrentAccessToken().getToken();
+
+                        Call<User> call = apiService.saveUser(userAuth);
+
+                        call.enqueue(new Callback<User>() {
+                            @Override
+                            public void onResponse(Response<User> response, Retrofit retrofit) {
+                                updatePosts(pushPosts, isOwn);
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                Log.d(TAG, "error: " + t.getMessage());
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.d(TAG, "error: " + t.getMessage());
+                }
+            });
+
+        } else {
+            // alert no internet
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        Log.d(TAG, "menu item selected: "+item.getItemId());
+
+        switch (item.getItemId()) {
+            case 0:
+
+                /*FragmentManager mFragmentManager = getFragmentManager();
+                FragmentTransaction mFragmentTransaction = mFragmentManager
+                        .beginTransaction();
+                Settings mPrefsFragment = new Settings();
+                mFragmentTransaction.replace(android.R.id.content, mPrefsFragment);
+                mFragmentTransaction.commit();*/
+
+                ((Tabbar) getActivity()).findViewById(R.id.tab_layout).setVisibility(View.GONE);
+                ((Tabbar) getActivity()).findViewById(R.id.fab).setVisibility(View.GONE);
+
+                FragmentManager manager = ((Tabbar)getActivity()).getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction(); //getParentFragment().getFragmentManager().beginTransaction();// manager.beginTransaction();
+                transaction.addToBackStack(null);
+                transaction.hide(Me.this);
+                transaction.replace(R.id.main_layout, new Settings()); // newInstance() is a static factory method.
+                transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                transaction.commit();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

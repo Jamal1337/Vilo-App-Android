@@ -5,6 +5,7 @@ import android.content.Context;
 import com.fabian.vilo.models.CDModels.CDUser;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -40,7 +41,7 @@ public class CDPost extends RealmObject {
     private String username;
     private int topTip;
     private CDUser user;
-    private CDComment comment;
+    private RealmList<CDComment> comments;
     private CDLocation location;
     private CDPoll poll;
 
@@ -152,8 +153,8 @@ public class CDPost extends RealmObject {
         return user;
     }
 
-    public CDComment getComment() {
-        return comment;
+    public RealmList<CDComment> getComments() {
+        return comments;
     }
 
     public CDLocation getLocation() {
@@ -272,8 +273,8 @@ public class CDPost extends RealmObject {
         this.user = user;
     }
 
-    public void setComment(CDComment comment) {
-        this.comment = comment;
+    public void setComments(RealmList<CDComment> comments) {
+        this.comments = comments;
     }
 
     public void setLocation(CDLocation location) {

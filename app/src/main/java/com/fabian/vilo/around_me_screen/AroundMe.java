@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,7 +35,11 @@ import com.fabian.vilo.cards.QuickpostCard;
 import com.fabian.vilo.detail_views.QuickpostDetail;
 import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
+import com.fabian.vilo.models.Card;
 import com.fabian.vilo.models.FbUserAuth;
+import com.fabian.vilo.models.GetPosts;
+import com.fabian.vilo.models.GetTotalEventpost;
+import com.fabian.vilo.models.GetTotalQuickpost;
 import com.fabian.vilo.models.User;
 import com.fabian.vilo.models.ViloResponse;
 import com.facebook.AccessToken;
@@ -46,9 +49,7 @@ import com.squareup.picasso.Picasso;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,6 +98,8 @@ public class AroundMe extends Fragment {
 
     SwipeFlingAdapterView flingContainer;
     View rootView;
+
+    private boolean shouldLoadCards = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -232,6 +235,10 @@ public class AroundMe extends Fragment {
         return rootView;
     }
 
+    public void setShouldLoadCards(boolean shouldLoadCards) {
+        this.shouldLoadCards = shouldLoadCards;
+    }
+
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -267,6 +274,59 @@ public class AroundMe extends Fragment {
                 // Execute the query:
                 RealmResults<CDUser> result = query.findAll();
 
+                if (sharedpreferences.contains("hassetlocation") && !sharedpreferences.getBoolean("hassetlocation", false)) {
+
+                    Map<String, String> parameters = new HashMap<String, String>();
+                    parameters.put("lat", sharedpreferences.getString("lat", "0"));
+                    parameters.put("lng", sharedpreferences.getString("lng", "0"));
+                    Call<ViloResponse> call = apiService.updateUserLocation(result.first().getUserid(), parameters);
+
+                    call.enqueue(new Callback<ViloResponse>() {
+                        @Override
+                        public void onResponse(Response<ViloResponse> response, Retrofit retrofit) {
+                            if (response.code() != 200) {
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                editor.putBoolean("hassetlocation", false);
+                                editor.apply();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+
+                        }
+                    });
+
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.putBoolean("hassetlocation", true);
+                    editor.apply();
+                } else {
+                    Map<String, String> parameters = new HashMap<String, String>();
+                    parameters.put("lat", sharedpreferences.getString("lat", "0"));
+                    parameters.put("lng", sharedpreferences.getString("lng", "0"));
+                    Call<ViloResponse> call = apiService.updateUserLocation(result.first().getUserid(), parameters);
+
+                    call.enqueue(new Callback<ViloResponse>() {
+                        @Override
+                        public void onResponse(Response<ViloResponse> response, Retrofit retrofit) {
+                            if (response.code() != 200) {
+                                SharedPreferences.Editor editor = sharedpreferences.edit();
+                                editor.putBoolean("hassetlocation", false);
+                                editor.apply();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Throwable t) {
+
+                        }
+                    });
+
+                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                    editor.putBoolean("hassetlocation", true);
+                    editor.apply();
+                }
+
                 Log.d(TAG, "userinfo: " + result.first().getFirst_name());
 
                 fetchPosts(rootView);
@@ -296,7 +356,7 @@ public class AroundMe extends Fragment {
 
             editor.putString("lat", "" + current_lattitude);
             editor.putString("lng", "" + current_longitude);
-            editor.commit();
+            editor.apply();
 
             Call<Posts> call = apiService.getPosts(sharedpreferences.getString("lat", "0"), sharedpreferences.getString("lng", "0"), sharedpreferences.getInt("radius", 10000), "mi");
 
@@ -535,7 +595,7 @@ public class AroundMe extends Fragment {
                 arrayAdapter.notifyDataSetChanged();
 
                 if (al.size() == 0) {
-                    rippleBackground.startRippleAnimation();
+                    //rippleBackground.startRippleAnimation();
                     //getPosts(rootView);
                 }
 
@@ -567,6 +627,7 @@ public class AroundMe extends Fragment {
                 QuickpostDetail quickpostDetail = new QuickpostDetail();
                 quickpostDetail.setTitle(getActivity().getTitle().toString());
                 quickpostDetail.setCard(clickedCard);
+                quickpostDetail.setParent(AroundMe.this);
                 Fragment fragment = quickpostDetail;
 
                 FragmentManager manager = ((Tabbar)getActivity()).getSupportFragmentManager();
@@ -597,9 +658,14 @@ public class AroundMe extends Fragment {
                 .setIcon(R.drawable.nav_radius)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
-        Log.d(TAG, "navigation item id: "+item.getItemId());
+        Log.d(TAG, "navigation item id: " + item.getItemId());
 
         inflater.inflate(R.menu.menu_tabbar, menu);
+
+        if (shouldLoadCards) {
+            shouldLoadCards = false;
+            clearCards();
+        }
     }
 
     @Override

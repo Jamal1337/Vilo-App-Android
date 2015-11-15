@@ -15,13 +15,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.fabian.vilo.api.ViloApiAdapter;
+import com.fabian.vilo.api.ViloApiEndpointInterface;
 import com.fabian.vilo.me_screen.Me;
 import com.fabian.vilo.R;
 import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.models.CDModels.CDPost;
+import com.fabian.vilo.models.User;
+import com.fabian.vilo.models.ViloResponse;
 import com.squareup.picasso.Picasso;
 
 import io.realm.Realm;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 /**
  * Created by Fabian on 10/10/15.
@@ -35,6 +43,10 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
     private CDPost post;
     private Me mAdapterCallback;
 
+    private Realm realm;
+    private ViloApiAdapter viloAdapter;
+    private ViloApiEndpointInterface apiService;
+
     SharedPreferences sharedpreferences;
 
     public ListViewAdapter(Context context, int resource, ArrayList<CDPost> data, Me parent) {
@@ -44,6 +56,12 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
         this.resourceID = resource;
         this.data = data;
         this.mAdapterCallback = parent;
+
+        this.realm = Realm.getInstance(context);
+
+        this.viloAdapter = ViloApiAdapter.getInstance(context);
+
+        this.apiService = viloAdapter.mApi;
 
     }
 
@@ -64,7 +82,7 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
                 case 0:
                     Log.d("bla", "title is quick: "+post.getTitle());
                     if (post.getImgURL().trim().length() > 0) {
-                        convertView = inflater.inflate(R.layout.listview_quickpost, null);
+                        convertView = inflater.inflate(R.layout.listview_quickpost, parent, false);
                         viewHolder.swipeImage = (ImageView) convertView.findViewById(R.id.swipeImage);
                     } else {
                         convertView = inflater.inflate(R.layout.listview_quickpost_noimage, null);
@@ -72,7 +90,7 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
                     break;
                 case 1:
                     Log.d("bla", "title is event: "+post.getTitle());
-                    convertView = inflater.inflate(R.layout.listview_eventpost, null);
+                    convertView = inflater.inflate(R.layout.listview_eventpost, parent, false);
                     viewHolder.swipeImage = (ImageView) convertView.findViewById(R.id.swipeImage);
                     break;
             }
@@ -87,18 +105,60 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // continue with delete
                                     //Log.d("bla", "delete post id: "+data.get(position).getId());
-                                    Realm realm = Realm.getInstance(context);
-                                    CDPost toEdit = realm.where(CDPost.class)
-                                            .equalTo("id", data.get(position).getId()).findFirst();
-                                    realm.beginTransaction();
-                                    toEdit.removeFromRealm();
-                                    realm.commitTransaction();
 
-                                    data.remove(position);
+                                    if (data.get(position).getIsOwn() == 0) {
 
-                                    notifyDataSetChanged();
+                                        Call<ViloResponse> call = apiService.deleteInterest(data.get(position).getId(), data.get(position).getType());
 
-                                    mAdapterCallback.updateInterests();
+                                        call.enqueue(new Callback<ViloResponse>() {
+                                            @Override
+                                            public void onResponse(Response<ViloResponse> response, Retrofit retrofit) {
+                                                CDPost toEdit = realm.where(CDPost.class)
+                                                        .equalTo("id", data.get(position).getId()).findFirst();
+                                                realm.beginTransaction();
+                                                toEdit.removeFromRealm();
+                                                realm.commitTransaction();
+                                                data.remove(position);
+
+                                                // interests post delete
+                                                mAdapterCallback.updateInterests();
+
+                                                notifyDataSetChanged();
+                                            }
+
+                                            @Override
+                                            public void onFailure(Throwable t) {
+                                                Log.d("error", "error: " + t.getMessage());
+                                            }
+                                        });
+
+
+                                    } else {
+
+                                        Call<ViloResponse> call = apiService.deletePost(data.get(position).getId(), data.get(position).getType());
+
+                                        call.enqueue(new Callback<ViloResponse>() {
+                                            @Override
+                                            public void onResponse(Response<ViloResponse> response, Retrofit retrofit) {
+                                                CDPost toEdit = realm.where(CDPost.class)
+                                                        .equalTo("id", data.get(position).getId()).findFirst();
+                                                realm.beginTransaction();
+                                                toEdit.removeFromRealm();
+                                                realm.commitTransaction();
+                                                data.remove(position);
+
+                                                // own posts delete
+                                                mAdapterCallback.updateOwn();
+
+                                                notifyDataSetChanged();
+                                            }
+
+                                            @Override
+                                            public void onFailure(Throwable t) {
+                                                Log.d("error", "error: " + t.getMessage());
+                                            }
+                                        });
+                                    }
 
                                 }
                             })

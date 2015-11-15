@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="#000">
 
     <com.fabian.vilo.custom_methods.TouchImageView
         android:id="@+id/imgDisplay"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:scaleType="fitCenter" />
 
     <Button
@@ -21,6 +22,7 @@
         android:paddingBottom="2dp"
         android:background="@drawable/button_background"
         android:textColor="#ffffff"
-        android:text="Close" />
+        android:text="Close"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1"
+    android:background="#fff">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="NOTIFICATIONS"
+        android:id="@+id/textView"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:textColor="#7d7d7d" />
+
+    <Switch
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/interests_push"
+        android:id="@+id/switch1"
+        android:textColor="#000"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp" />
+
+    <Switch
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/own_push"
+        android:id="@+id/switch2"
+        android:textColor="#000"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="ABOUT"
+        android:id="@+id/textView2"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:textColor="#7d7d7d" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/privacypolicy"
+        android:id="@+id/button"
+        android:background="#fff"
+        android:textAlignment="viewStart"
+        android:layout_marginLeft="10dp"
+        android:textColor="#000"
+        android:layout_gravity="left" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/termsofservice"
+        android:id="@+id/button2"
+        android:background="#fff"
+        android:textAlignment="viewStart"
+        android:layout_marginLeft="10dp"
+        android:textColor="#000"
+        android:layout_gravity="left" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/imprint"
+        android:id="@+id/button3"
+        android:background="#fff"
+        android:textAlignment="viewStart"
+        android:layout_marginLeft="10dp"
+        android:textColor="#000"
+        android:layout_gravity="left" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="ACCOUNT"
+        android:id="@+id/textView3"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:textColor="#7d7d7d" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/com_facebook_loginview_log_out_action"
+        android:id="@+id/button4"
+        android:background="#fff"
+        android:textColor="#000" />
+
+</LinearLayout>

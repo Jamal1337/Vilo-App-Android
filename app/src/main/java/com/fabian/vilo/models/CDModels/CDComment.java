@@ -7,12 +7,12 @@ import io.realm.RealmObject;
  */
 public class CDComment extends RealmObject {
 
-    private byte attachment;
+    private byte[] attachment;
     private int commentid;
     private String imgURL;
     private float latitude;
     private float longitude;
-    private byte photo;
+    private byte[] photo;
     private int postid;
     private String timestamp;
     private int type;
@@ -26,7 +26,7 @@ public class CDComment extends RealmObject {
      * Getter
      */
 
-    public byte getAttachment() {
+    public byte[] getAttachment() {
         return attachment;
     }
 
@@ -46,7 +46,7 @@ public class CDComment extends RealmObject {
         return longitude;
     }
 
-    public byte getPhoto() {
+    public byte[] getPhoto() {
         return photo;
     }
 
@@ -86,7 +86,7 @@ public class CDComment extends RealmObject {
      * Setter
      */
 
-    public void setAttachment(byte attachment) {
+    public void setAttachment(byte[] attachment) {
         this.attachment = attachment;
     }
 
@@ -106,7 +106,7 @@ public class CDComment extends RealmObject {
         this.longitude = longitude;
     }
 
-    public void setPhoto(byte photo) {
+    public void setPhoto(byte[] photo) {
         this.photo = photo;
     }
 

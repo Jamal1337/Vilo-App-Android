@@ -80,8 +80,6 @@ public class Tabbar extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Log.d(TAG, "btn pressed");
-
                 // load quickpost upload
 
                 NewQuickpost newQuickpost = new NewQuickpost();
@@ -89,8 +87,6 @@ public class Tabbar extends AppCompatActivity {
 
                 getSupportActionBar().hide();
 
-                Log.d(TAG, "activity: " + tabLayout.getSelectedTabPosition());
-                Log.d(TAG, "activity: " + tabLayout.getTabAt(0).getClass());
                 isVisible = false;
 
                 FragmentManager manager = getSupportFragmentManager();
@@ -99,26 +95,6 @@ public class Tabbar extends AppCompatActivity {
                 transaction.replace(R.id.main_layout, fragment); // newInstance() is a static factory method.
                 transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                 transaction.commit();
-
-                //Intent i = new Intent(Tabbar.this, Quickpost.class);
-                //startActivity(i);
-
-                /*FragmentTransaction fragmenttransaction = getFragmentManager().beginTransaction();
-                //fragmenttransaction.setCustomAnimations(0x7f040000, 0, 0, 0x7f040001);
-                fragmenttransaction.replace(R.layout.activity_around_me, Quickpost.newInstance(), "postFragment");
-                fragmenttransaction.addToBackStack(null);
-                fragmenttransaction.commit();*/
-
-
-                /*final AlertDialog dialog = new AlertDialog
-                        .Builder(Tabbar.this)
-                        .setTitle("GEILE APP DIGGA")
-                        .setPositiveButton("Close", null)
-                        .create();
-                dialog.getWindow().getAttributes().dimAmount = 0.5f;
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-
-                dialog.show();*/
 
             }
         });

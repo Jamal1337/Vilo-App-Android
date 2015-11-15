@@ -1,4 +1,4 @@
-package com.fabian.vilo.API;
+package com.fabian.vilo.api;
 
 /*
  * Copyright (c) 2011 James Smith <james@loopj.com>
@@ -86,7 +86,7 @@ public class SerializableHttpCookie implements Serializable {
     private boolean getHttpOnly() {
         try {
             initFieldHttpOnly();
-            return (boolean) fieldHttpOnly.get(cookie);
+            return (Boolean) fieldHttpOnly.get(cookie);
         } catch (Exception e) {
             // NoSuchFieldException || IllegalAccessException ||
             // IllegalArgumentException

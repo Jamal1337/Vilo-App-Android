@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Parcelable;
@@ -18,10 +14,8 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,25 +30,18 @@ import com.fabian.vilo.R;
 import com.fabian.vilo.Tabbar;
 import com.fabian.vilo.api.ViloApiAdapter;
 import com.fabian.vilo.api.ViloApiEndpointInterface;
-import com.fabian.vilo.around_me_screen.Card;
+import com.fabian.vilo.models.Card;
 import com.fabian.vilo.custom_methods.GPSTracker;
+import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
 import com.fabian.vilo.models.QuickUpload;
-import com.fabian.vilo.models.User;
 import com.fabian.vilo.models.ViloUploadResponse;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,7 +50,6 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
-import io.realm.processor.Utils;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -125,7 +111,7 @@ public class NewQuickpost extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d("bla", "upload button pressed!");
-                if(gps.canGetLocation())
+                if (gps.canGetLocation())
 
                 {
 
@@ -164,9 +150,9 @@ public class NewQuickpost extends Fragment {
                         if (photoSelected == true) {
 
                             //File file = new File(selectedImageUri);
-                            File file = new File(getRealPathFromURI(getContext(), selectedImageUri));
+                            File file = new File(new Util().getRealPathFromURI(getContext(), selectedImageUri));
 
-                            File reducedFile = saveBitmapToFile(file);
+                            File reducedFile = new Util().saveBitmapToFile(file, getContext());
 
                             RequestBody requestBody =
                                     RequestBody.create(MediaType.parse("multipart/form-data"), reducedFile);
@@ -310,7 +296,7 @@ public class NewQuickpost extends Fragment {
                 }
                 Log.d("upload", "image uri: "+selectedImageUri);
                 Log.d("upload", "image uri: "+selectedImageUri.getPath());
-                Log.d("upload", "image uri: "+getRealPathFromURI(getContext(), selectedImageUri));
+                Log.d("upload", "image uri: "+new Util().getRealPathFromURI(getContext(), selectedImageUri));
                 photoSelected = true;
                 chooseImage.setVisibility(View.GONE);
                 uploadImage.setVisibility(View.VISIBLE);
@@ -324,66 +310,6 @@ public class NewQuickpost extends Fragment {
                 btnDelete.setVisibility(View.VISIBLE);
                 choosePhoto.setClickable(false);
             }
-        }
-    }
-
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-    public File saveBitmapToFile(File file){
-        try {
-
-            // BitmapFactory options to downsize the image
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            o.inSampleSize = 6;
-            // factor of downsizing the image
-
-            FileInputStream inputStream = new FileInputStream(file);
-            //Bitmap selectedBitmap = null;
-            BitmapFactory.decodeStream(inputStream, null, o);
-            inputStream.close();
-
-            // The new size we want to scale to
-            final int REQUIRED_SIZE=75;
-
-            // Find the correct scale value. It should be the power of 2.
-            int scale = 1;
-            while(o.outWidth / scale / 2 >= REQUIRED_SIZE &&
-                    o.outHeight / scale / 2 >= REQUIRED_SIZE) {
-                scale *= 2;
-            }
-
-            BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize = scale;
-            inputStream = new FileInputStream(file);
-
-            Bitmap selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2);
-            inputStream.close();
-
-            // here i override the original image file
-            File outputDir = getContext().getCacheDir(); // context being the Activity pointer
-            File outputFile = File.createTempFile("prefix", "extension", outputDir);
-            outputFile.createNewFile();
-            FileOutputStream outputStream = new FileOutputStream(outputFile);
-
-            selectedBitmap.compress(Bitmap.CompressFormat.JPEG, 100 , outputStream);
-
-            return outputFile;
-        } catch (Exception e) {
-            return null;
         }
     }
 

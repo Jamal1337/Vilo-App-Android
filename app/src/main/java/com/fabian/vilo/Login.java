@@ -10,8 +10,12 @@ import android.util.Log;
 import com.fabian.vilo.api.ViloApiAdapter;
 import com.fabian.vilo.api.ViloApiEndpointInterface;
 import com.fabian.vilo.around_me_screen.AroundMe;
+import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
 import com.fabian.vilo.models.FbUserAuth;
+import com.fabian.vilo.models.GetPosts;
+import com.fabian.vilo.models.GetTotalEventpost;
+import com.fabian.vilo.models.GetTotalQuickpost;
 import com.fabian.vilo.models.User;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -27,6 +31,9 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+import io.realm.Realm;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -40,6 +47,8 @@ public class Login extends FragmentActivity {
     SharedPreferences sharedpreferences;
     private CallbackManager callbackManager;
     private static final String TAG = AroundMe.class.getSimpleName();
+    private int downloadedPostsCounter = 0;
+    private ModelManager modelManager = new ModelManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +154,9 @@ public class Login extends FragmentActivity {
 
                 ModelManager modelManager = new ModelManager();
                 if (modelManager.storeUserToDB(response, getApplicationContext()) == true) {
-                    finish();
+                    // check if user already has posts stored in db => download and save in realm
+                    getUserPosts();
+                    //finish();
                 }
 
                 /*Uri myUri = Uri.parse(response.body().photo);
@@ -179,6 +190,201 @@ public class Login extends FragmentActivity {
             }
         });
 
+    }
+
+    public void getUserPosts() {
+        ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(getApplicationContext());
+
+        final ViloApiEndpointInterface apiService = viloAdapter.mApi;
+
+        Call<GetPosts> call = apiService.getPosts(85503);
+
+        call.enqueue(new Callback<GetPosts>() {
+            @Override
+            public void onResponse(Response<GetPosts> response, Retrofit retrofit) {
+                Log.d(TAG, "first id: "+response.body().interests.size());
+                Log.d(TAG, "first id: "+response.body().own.size());
+
+                final int totalDownloadPosts = response.body().interests.size() + response.body().own.size();
+                Realm realm = Realm.getInstance(getApplicationContext());
+                // Build the query looking at all users:
+                RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+                // Execute the query:
+                RealmResults<CDUser> result = query.findAll();
+                final CDUser user = result.first();
+
+                if (response.body().interests.size() > 0) {
+                    int totalInterests = response.body().interests.size();
+                    for (int i = 0; i < totalInterests; i++) {
+
+                        Log.d(TAG, "interestid: "+response.body().interests.get(i).id);
+                        Log.d(TAG, "interesttype: "+response.body().interests.get(i).type);
+
+                        switch (response.body().interests.get(i).type) {
+                            case 0:
+
+                                Call<GetTotalQuickpost> call = apiService.getTotalQuickPost(response.body().interests.get(i).id);
+
+                                call.enqueue(new Callback<GetTotalQuickpost>() {
+                                    @Override
+                                    public void onResponse(Response<GetTotalQuickpost> response, Retrofit retrofit) {
+
+                                        if (modelManager.storeQuickPostInRealm(response.body(), 0, user, getApplicationContext())) {
+                                            downloadedPostsCounter++;
+
+                                            if (downloadedPostsCounter == totalDownloadPosts) {
+                                                finish();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        Log.d("", "error: " + t.getMessage());
+                                    }
+                                });
+
+                                break;
+                            case 1:
+                                Call<GetTotalEventpost> callEvent = apiService.getTotalEventPost(response.body().interests.get(i).id);
+
+                                callEvent.enqueue(new Callback<GetTotalEventpost>() {
+                                    @Override
+                                    public void onResponse(Response<GetTotalEventpost> response, Retrofit retrofit) {
+
+                                        if (modelManager.storeEventPostInRealm(response.body(), 0, user, getApplicationContext())) {
+                                            downloadedPostsCounter++;
+
+                                            if (downloadedPostsCounter == totalDownloadPosts) {
+                                                finish();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        Log.d("", "error: " + t.getMessage());
+                                    }
+                                });
+
+                                break;
+                            case 2:
+                                downloadedPostsCounter++;
+                                if (downloadedPostsCounter == totalDownloadPosts) {
+                                    Log.d("bla", "all cards fetched in poll");
+                                    finish();
+                                }
+                                break;
+                            case 3:
+                                downloadedPostsCounter++;
+                                if (downloadedPostsCounter == totalDownloadPosts) {
+                                    Log.d("bla", "all cards fetched in album");
+                                    finish();
+                                }
+                                break;
+                            case 4:
+                                downloadedPostsCounter++;
+                                if (downloadedPostsCounter == totalDownloadPosts) {
+                                    Log.d("bla", "all cards fetched in meetup");
+                                    finish();
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }
+                }
+
+                if (response.body().own.size() > 0) {
+                    int totalOwn = response.body().own.size();
+                    for (int j = 0; j < totalOwn; j++) {
+                        Log.d(TAG, "ownid: "+response.body().own.get(j).id);
+                        Log.d(TAG, "owntype: "+response.body().own.get(j).type);
+                        switch (response.body().own.get(j).type) {
+                            case 0:
+
+                                Call<GetTotalQuickpost> call = apiService.getTotalQuickPost(response.body().own.get(j).id);
+
+                                call.enqueue(new Callback<GetTotalQuickpost>() {
+                                    @Override
+                                    public void onResponse(Response<GetTotalQuickpost> response, Retrofit retrofit) {
+
+                                        if (modelManager.storeQuickPostInRealm(response.body(), 1, user, getApplicationContext())) {
+                                            downloadedPostsCounter++;
+
+                                            if (downloadedPostsCounter == totalDownloadPosts) {
+                                                finish();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        Log.d("", "error: " + t.getMessage());
+                                    }
+                                });
+
+                                break;
+                            case 1:
+                                Call<GetTotalEventpost> callEvent = apiService.getTotalEventPost(response.body().own.get(j).id);
+
+                                callEvent.enqueue(new Callback<GetTotalEventpost>() {
+                                    @Override
+                                    public void onResponse(Response<GetTotalEventpost> response, Retrofit retrofit) {
+
+                                        if (modelManager.storeEventPostInRealm(response.body(), 1, user, getApplicationContext())) {
+                                            downloadedPostsCounter++;
+
+                                            if (downloadedPostsCounter == totalDownloadPosts) {
+                                                finish();
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Throwable t) {
+                                        Log.d("", "error: " + t.getMessage());
+                                    }
+                                });
+
+                                break;
+                            case 2:
+                                downloadedPostsCounter++;
+                                if (downloadedPostsCounter == totalDownloadPosts) {
+                                    Log.d("bla", "all cards fetched in poll");
+                                    finish();
+                                }
+                                break;
+                            case 3:
+                                downloadedPostsCounter++;
+                                if (downloadedPostsCounter == totalDownloadPosts) {
+                                    Log.d("bla", "all cards fetched in album");
+                                    finish();
+                                }
+                                break;
+                            case 4:
+                                downloadedPostsCounter++;
+                                if (downloadedPostsCounter == totalDownloadPosts) {
+                                    Log.d("bla", "all cards fetched in meetup");
+                                    finish();
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d(TAG, "error: " + t.getMessage());
+            }
+        });
     }
 
     /*public Login() {
