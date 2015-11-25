@@ -104,8 +104,8 @@ public class CardAdapter extends ArrayAdapter<Card> {
                     .fit()
                     .into(viewHolder.cardImage);*/
 
-            new ImageDownloader(viewHolder.userImage).execute(card.photo);
-            new ImageDownloader(viewHolder.cardImage).execute(card.attachment);
+            //new ImageDownloader(viewHolder.userImage).execute(card.photo);
+            //new ImageDownloader(viewHolder.cardImage).execute(card.attachment);
         }
 
 

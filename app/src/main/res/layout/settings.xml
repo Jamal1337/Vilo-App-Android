@@ -3,7 +3,7 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:weightSum="1"
-    android:background="#fff">
+    android:background="#dedede">
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,26 +12,28 @@
         android:text="NOTIFICATIONS"
         android:id="@+id/textView"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:textColor="#7d7d7d" />
 
     <Switch
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="@string/interests_push"
-        android:id="@+id/switch1"
+        android:id="@+id/interests_push_switch"
         android:textColor="#000"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp" />
+        android:background="#fff"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
 
     <Switch
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:text="@string/own_push"
-        android:id="@+id/switch2"
+        android:id="@+id/own_push_switch"
         android:textColor="#000"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp" />
+        android:background="#fff"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -40,41 +42,41 @@
         android:text="ABOUT"
         android:id="@+id/textView2"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:textColor="#7d7d7d" />
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/privacypolicy"
-        android:id="@+id/button"
+        android:id="@+id/privacypolicyBtn"
         android:background="#fff"
-        android:textAlignment="viewStart"
-        android:layout_marginLeft="10dp"
+        android:gravity="left|center_vertical"
         android:textColor="#000"
-        android:layout_gravity="left" />
+        android:layout_gravity="left"
+        android:paddingLeft="10dp" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/termsofservice"
-        android:id="@+id/button2"
+        android:id="@+id/termsofserviceBtn"
         android:background="#fff"
-        android:textAlignment="viewStart"
-        android:layout_marginLeft="10dp"
+        android:gravity="left|center_vertical"
         android:textColor="#000"
-        android:layout_gravity="left" />
+        android:layout_gravity="left"
+        android:paddingLeft="10dp" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/imprint"
-        android:id="@+id/button3"
+        android:id="@+id/imprintBtn"
         android:background="#fff"
-        android:textAlignment="viewStart"
-        android:layout_marginLeft="10dp"
+        android:gravity="left|center_vertical"
         android:textColor="#000"
-        android:layout_gravity="left" />
+        android:layout_gravity="left"
+        android:paddingLeft="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -83,14 +85,14 @@
         android:text="ACCOUNT"
         android:id="@+id/textView3"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
         android:textColor="#7d7d7d" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/com_facebook_loginview_log_out_action"
-        android:id="@+id/button4"
+        android:id="@+id/logoutBtn"
         android:background="#fff"
         android:textColor="#000" />
 

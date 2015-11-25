@@ -126,4 +126,7 @@ public interface ViloApiEndpointInterface {
     @GET("/api/v1/post/{type}/{postid}/comments")
     Call<NewQuickComments> loadCommentsOfPost(@Path("type") String type, @Path("postid") Integer postid);
 
+    @PUT("/api/v1/user/{userid}/updatepushsettings")
+    Call<ViloResponse> updatePushSettings(@Path("userid") Integer userid, @Body Map<String,String> parameters);
+
 }

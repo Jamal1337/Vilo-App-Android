@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -24,6 +25,7 @@ import com.fabian.vilo.api.ViloApiEndpointInterface;
 import com.fabian.vilo.adapters.CardAdapter;
 import com.fabian.vilo.adapters.CardManager;
 import com.fabian.vilo.custom_methods.GPSTracker;
+import com.fabian.vilo.custom_methods.ImageDownloader;
 import com.fabian.vilo.custom_methods.UnitLocale;
 import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.Login;
@@ -37,9 +39,6 @@ import com.fabian.vilo.models.CDModels.CDUser;
 import com.fabian.vilo.models.CDModels.ModelManager;
 import com.fabian.vilo.models.Card;
 import com.fabian.vilo.models.FbUserAuth;
-import com.fabian.vilo.models.GetPosts;
-import com.fabian.vilo.models.GetTotalEventpost;
-import com.fabian.vilo.models.GetTotalQuickpost;
 import com.fabian.vilo.models.User;
 import com.fabian.vilo.models.ViloResponse;
 import com.facebook.AccessToken;
@@ -47,7 +46,11 @@ import com.skyfishjy.library.RippleBackground;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.RoundingMode;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -232,6 +235,14 @@ public class AroundMe extends Fragment {
             startActivity(intent);
         }*/
 
+        String android_id = Settings.Secure.getString(getContext().getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        Log.d(TAG, "device id: " + android_id);
+
+        //byte[] bytes;
+        //new ImageDownloader(bytes).execute("https://vilostorage.s3.amazonaws.com/profilepics/user_41444676563.png");
+
         return rootView;
     }
 
@@ -261,7 +272,7 @@ public class AroundMe extends Fragment {
     public void onResume() {
         // TODO: wird aufgerufen wenn man im upload screen ist und mitm image picker ein bild ausgewählt hat
         super.onResume();
-        if (((Tabbar) getActivity()).getIsVisible() == true) {
+        if (((Tabbar) getActivity()).getIsVisible()) {
             getActivity().setTitle("Around Me");
             if (sharedpreferences.contains("loggedin")) {
                 Log.d(TAG, "logged in pref is set");

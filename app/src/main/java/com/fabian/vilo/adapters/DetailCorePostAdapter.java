@@ -216,6 +216,7 @@ public class DetailCorePostAdapter extends ArrayAdapter<RealmObject> {
                     viewHolder.commentImage.setVisibility(View.GONE);
                 }
 
+
                 if (arrayList.size()-1 == position) {
                     viewHolder.commentLine.setBackgroundColor(Color.WHITE);
                 } else {

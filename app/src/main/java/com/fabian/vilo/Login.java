@@ -1,11 +1,18 @@
 package com.fabian.vilo;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import com.fabian.vilo.api.ViloApiAdapter;
 import com.fabian.vilo.api.ViloApiEndpointInterface;
@@ -49,6 +56,8 @@ public class Login extends FragmentActivity {
     private static final String TAG = AroundMe.class.getSimpleName();
     private int downloadedPostsCounter = 0;
     private ModelManager modelManager = new ModelManager();
+    private Boolean agbCheck = false;
+    private ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +67,63 @@ public class Login extends FragmentActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
-        LoginButton loginButton = (LoginButton) findViewById(R.id.fb_login_button);
+        TextView tosText = (TextView) findViewById(R.id.TOSLink);
+        TextView ppText = (TextView) findViewById(R.id.PPLink);
+
+        tosText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                WebViewController webView = new WebViewController();
+                webView.setUrl(getApplicationContext().getResources().getText(R.string.termsofserviceurl).toString());
+
+                FragmentManager manager = getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.addToBackStack(null);
+                transaction.replace(R.id.loginFrame, webView);
+                transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                transaction.commit();
+
+            }
+        });
+
+        ppText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WebViewController webView = new WebViewController();
+                webView.setUrl(getApplicationContext().getResources().getText(R.string.privacypolicyurl).toString());
+
+                FragmentManager manager = getSupportFragmentManager();
+                FragmentTransaction transaction = manager.beginTransaction();
+                transaction.addToBackStack(null);
+                transaction.replace(R.id.loginFrame, webView);
+                transaction.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                transaction.commit();
+            }
+        });
+
+        final LoginButton loginButton = (LoginButton) findViewById(R.id.fb_login_button);
+        loginButton.setEnabled(false);
+        agbCheck = false;
+
+        CheckBox agbCheckbox = (CheckBox) findViewById(R.id.agbCheckbox);
+
+        agbCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    agbCheck = true;
+                    loginButton.setEnabled(true);
+                } else {
+                    agbCheck = false;
+                    loginButton.setEnabled(false);
+                }
+            }
+        });
+
+        progress = new ProgressDialog(Login.this);
+
+
         loginButton.setReadPermissions(Arrays.asList("user_friends", "email"));
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
@@ -74,6 +139,11 @@ public class Login extends FragmentActivity {
                                 if (response.getError() != null) {
                                     // handle error
                                 } else {
+
+                                    progress.setTitle(R.string.loginLoadingTitle);
+                                    progress.setMessage(Login.this.getResources().getText(R.string.loginLoadingMessage));
+                                    progress.show();
+
                                     sharedpreferences = getApplicationContext().getSharedPreferences("MyPreferences", Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = sharedpreferences.edit();
                                     editor.putBoolean("loggedin", true);
@@ -86,7 +156,7 @@ public class Login extends FragmentActivity {
 
                                     String locale = getApplicationContext().getResources().getConfiguration().locale.getCountry();
                                     FbUserAuth userAuth = new FbUserAuth();
-                                    userAuth.interests_push = 0;
+                                    userAuth.interests_push = 1;
                                     userAuth.own_push = 1;
                                     userAuth.origin = locale;
                                     userAuth.token = loginResult.getAccessToken().getToken();
@@ -235,6 +305,7 @@ public class Login extends FragmentActivity {
 
                                             if (downloadedPostsCounter == totalDownloadPosts) {
                                                 finish();
+                                                progress.dismiss();
                                             }
                                         }
                                     }
@@ -258,6 +329,7 @@ public class Login extends FragmentActivity {
 
                                             if (downloadedPostsCounter == totalDownloadPosts) {
                                                 finish();
+                                                progress.dismiss();
                                             }
                                         }
                                     }
@@ -274,6 +346,7 @@ public class Login extends FragmentActivity {
                                 if (downloadedPostsCounter == totalDownloadPosts) {
                                     Log.d("bla", "all cards fetched in poll");
                                     finish();
+                                    progress.dismiss();
                                 }
                                 break;
                             case 3:
@@ -281,6 +354,7 @@ public class Login extends FragmentActivity {
                                 if (downloadedPostsCounter == totalDownloadPosts) {
                                     Log.d("bla", "all cards fetched in album");
                                     finish();
+                                    progress.dismiss();
                                 }
                                 break;
                             case 4:
@@ -288,6 +362,7 @@ public class Login extends FragmentActivity {
                                 if (downloadedPostsCounter == totalDownloadPosts) {
                                     Log.d("bla", "all cards fetched in meetup");
                                     finish();
+                                    progress.dismiss();
                                 }
                                 break;
                             default:
@@ -316,6 +391,7 @@ public class Login extends FragmentActivity {
 
                                             if (downloadedPostsCounter == totalDownloadPosts) {
                                                 finish();
+                                                progress.dismiss();
                                             }
                                         }
                                     }
@@ -339,6 +415,7 @@ public class Login extends FragmentActivity {
 
                                             if (downloadedPostsCounter == totalDownloadPosts) {
                                                 finish();
+                                                progress.dismiss();
                                             }
                                         }
                                     }
@@ -355,6 +432,7 @@ public class Login extends FragmentActivity {
                                 if (downloadedPostsCounter == totalDownloadPosts) {
                                     Log.d("bla", "all cards fetched in poll");
                                     finish();
+                                    progress.dismiss();
                                 }
                                 break;
                             case 3:
@@ -362,6 +440,7 @@ public class Login extends FragmentActivity {
                                 if (downloadedPostsCounter == totalDownloadPosts) {
                                     Log.d("bla", "all cards fetched in album");
                                     finish();
+                                    progress.dismiss();
                                 }
                                 break;
                             case 4:
@@ -369,6 +448,7 @@ public class Login extends FragmentActivity {
                                 if (downloadedPostsCounter == totalDownloadPosts) {
                                     Log.d("bla", "all cards fetched in meetup");
                                     finish();
+                                    progress.dismiss();
                                 }
                                 break;
                             default:

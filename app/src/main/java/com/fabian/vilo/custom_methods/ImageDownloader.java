@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 /**
@@ -13,9 +14,14 @@ import java.io.InputStream;
  */
 public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
     ImageView bmImage;
+    byte[] bytes;
 
-    public ImageDownloader(ImageView bmImage) {
+    /*public ImageDownloader(ImageView bmImage) {
         this.bmImage = bmImage;
+    }*/
+
+    public ImageDownloader(byte[] bytes) {
+        this.bytes = bytes;
     }
 
     protected Bitmap doInBackground(String... urls) {
@@ -31,6 +37,9 @@ public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
     }
 
     protected void onPostExecute(Bitmap result) {
-        bmImage.setImageBitmap(result);
+        //bmImage.setImageBitmap(result);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        result.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        bytes = stream.toByteArray();
     }
 }

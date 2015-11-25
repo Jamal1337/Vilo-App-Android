@@ -1,8 +1,14 @@
 package com.fabian.vilo.me_screen;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.support.design.widget.TabLayout;
@@ -41,6 +47,7 @@ import com.fabian.vilo.Settings;
 import com.fabian.vilo.Tabbar;
 import com.fabian.vilo.api.ViloApiAdapter;
 import com.fabian.vilo.api.ViloApiEndpointInterface;
+import com.fabian.vilo.custom_methods.BlurBuilder;
 import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.detail_views.QuickpostDetail;
 import com.fabian.vilo.R;
@@ -77,10 +84,13 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
     TextView txtPostsCount;
     View rootView;
     Realm realm;
+    View header;
 
     private ArrayList<CDPost> listViewPosts = new ArrayList<CDPost>();
     private ListView myListView;
     private ListViewAdapter adapter;
+
+    private Boolean firstViewLaunch = true;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -101,7 +111,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
         context = getActivity();
 
-        if(sharedpreferences.contains("loggedin")) {
+        //if(sharedpreferences.contains("loggedin")) {
 
             RelativeLayout coverImage = (RelativeLayout) rootView.findViewById(R.id.containerTop);
 
@@ -110,7 +120,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
             //ImageButton profileImage = (ImageButton) rootView.findViewById(R.id.profile);
 
 
-            realm = Realm.getInstance(context);
+            /*realm = Realm.getInstance(context);
 
             // Build the query looking at all users:
             RealmQuery<CDUser> query = realm.where(CDUser.class);
@@ -118,7 +128,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
             // Execute the query:
             RealmResults<CDUser> result = query.findAll();
 
-            user = result.first();
+            user = result.first();*/
             //Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
 
             //((ImageButton)rootView.findViewById(R.id.profile)).setImageBitmap(Util.getRoundedCornerBitmap(((BitmapDrawable)((ImageButton) rootView.findViewById(R.id.profile)).getDrawable()).getBitmap(), 180));
@@ -144,7 +154,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
                                     }
             );*/
 
-            View header = getActivity().getLayoutInflater().inflate(R.layout.me_list_header, null);
+            header = getActivity().getLayoutInflater().inflate(R.layout.me_list_header, null);
             myListView.addHeaderView(header);
 
             adapter = new ListViewAdapter(getActivity(), R.layout.listview_quickpost, listViewPosts, this);
@@ -162,15 +172,15 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
                             ((Tabbar) getActivity()).findViewById(R.id.tab_layout).setVisibility(View.GONE);
                             ((Tabbar) getActivity()).findViewById(R.id.fab).setVisibility(View.GONE);
 
-                            CustomViewPager pager = (CustomViewPager)((Tabbar) getActivity()).findViewById(R.id.pager);
+                            CustomViewPager pager = (CustomViewPager) ((Tabbar) getActivity()).findViewById(R.id.pager);
                             pager.setSwipeable(false);
 
                             QuickpostDetail quickpostDetail = new QuickpostDetail();
                             quickpostDetail.setTitle(getActivity().getTitle().toString());
-                            quickpostDetail.setPost(listViewPosts.get(position-1));
+                            quickpostDetail.setPost(listViewPosts.get(position - 1));
                             Fragment fragment = quickpostDetail;
 
-                            FragmentManager manager = ((Tabbar)getActivity()).getSupportFragmentManager();
+                            FragmentManager manager = ((Tabbar) getActivity()).getSupportFragmentManager();
                             FragmentTransaction transaction = manager.beginTransaction(); //getParentFragment().getFragmentManager().beginTransaction();// manager.beginTransaction();
                             transaction.addToBackStack(null);
                             transaction.hide(Me.this);
@@ -182,8 +192,8 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
                     }
             );
 
-            ImageView profileImage = (ImageView) header.findViewById(R.id.profile);
-            Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
+            //ImageView profileImage = (ImageView) header.findViewById(R.id.profile);
+            //Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
 
 
             txtInterests = (TextView) header.findViewById(R.id.txtInterests);
@@ -221,7 +231,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
             setHasOptionsMenu(true);
 
-        }
+        //}
 
         return rootView; //inflater.inflate(R.layout.activity_me, container, false);
     }
@@ -280,6 +290,23 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         if (isVisibleToUser && sharedpreferences.contains("loggedin")) {
             Log.d(TAG, "ME SCREEN APPEARED");
 
+            if (firstViewLaunch) {
+                realm = Realm.getInstance(context);
+
+                // Build the query looking at all users:
+                RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+                // Execute the query:
+                RealmResults<CDUser> result = query.findAll();
+
+                user = result.first();
+
+                ImageView profileImage = (ImageView) header.findViewById(R.id.profile);
+                Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
+
+                firstViewLaunch = false;
+            }
+
             realm = Realm.getInstance(context);
 
             // Build the query looking at all users:
@@ -290,11 +317,12 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
             getActivity().setTitle(result.first().getFirst_name());
 
-            final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtInterestsCount);
-            textViewToChange.setText(""+getNumberOfInterestPosts());
+            final TextView textViewToChange = (TextView) header.findViewById(R.id.txtInterestsCount);
+            // TODO: crasht beim ersten mal auf den Me Screen gehen nachm Login
+            textViewToChange.setText(String.valueOf(getNumberOfInterestPosts()));
 
-            final TextView ownPosts = (TextView) rootView.findViewById(R.id.txtPostsCount);
-            ownPosts.setText(""+getNumberOfOwnPosts());
+            final TextView ownPosts = (TextView) header.findViewById(R.id.txtPostsCount);
+            ownPosts.setText(String.valueOf(getNumberOfOwnPosts()));
 
             displayInterests();
 
@@ -459,17 +487,19 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         // Execute the query:
         RealmResults<CDPost> result = query.findAll();
 
+        Log.d(TAG, "array size: "+result.size());
+
         return result.size();
     }
 
     public void updateInterests() {
         final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtInterestsCount);
-        textViewToChange.setText(""+getNumberOfInterestPosts());
+        textViewToChange.setText(String.valueOf(getNumberOfInterestPosts()));
     }
 
     public void updateOwn() {
         final TextView textViewToChange = (TextView) rootView.findViewById(R.id.txtPostsCount);
-        textViewToChange.setText("" + getNumberOfOwnPosts());
+        textViewToChange.setText(String.valueOf(getNumberOfOwnPosts()));
     }
 
     public void refreshInterests() {
@@ -482,7 +512,7 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
     }
 
     public void updatePosts(final Map<String, ArrayList> pushPosts, final Integer isOwn) {
-        if (new Util().isNetworkAvailable(context) == true) {
+        if (new Util().isNetworkAvailable(context)) {
 
             ViloApiAdapter viloAdapter = ViloApiAdapter.getInstance(context);
 
