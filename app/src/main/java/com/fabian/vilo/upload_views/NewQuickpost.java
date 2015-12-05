@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.R;
 import com.fabian.vilo.Tabbar;
 import com.fabian.vilo.api.ViloApiAdapter;
@@ -39,7 +40,6 @@ import com.fabian.vilo.models.QuickUpload;
 import com.fabian.vilo.models.ViloUploadResponse;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -300,10 +300,10 @@ public class NewQuickpost extends Fragment {
                 photoSelected = true;
                 chooseImage.setVisibility(View.GONE);
                 uploadImage.setVisibility(View.VISIBLE);
-                Picasso.with(getContext())
+                Glide.with(getContext())
                         .load(selectedImageUri)
                         .centerCrop()
-                        .fit()
+                        //.fit()
                         .into(uploadImage);
                 //uploadImage.setImageURI(null);
                 //uploadImage.setImageURI(selectedImageUri);

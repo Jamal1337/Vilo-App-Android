@@ -25,6 +25,7 @@ import android.view.View;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import com.crashlytics.android.Crashlytics;
 import com.fabian.vilo.adapters.PagerAdapter;
 import com.fabian.vilo.gcm.QuickstartPreferences;
 import com.fabian.vilo.gcm.RegistrationIntentService;
@@ -36,6 +37,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import io.fabric.sdk.android.Fabric;
 import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookiePolicy;
@@ -64,6 +66,7 @@ public class Tabbar extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_tabbar);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
@@ -352,6 +355,6 @@ public class Tabbar extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
+        editor.apply();
     }
 }

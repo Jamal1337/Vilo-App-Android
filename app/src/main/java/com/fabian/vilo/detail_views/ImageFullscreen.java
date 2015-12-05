@@ -10,9 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.R;
 import com.fabian.vilo.Tabbar;
-import com.squareup.picasso.Picasso;
 
 /**
  * Created by Fabian on 06/11/15.
@@ -33,7 +33,7 @@ public class ImageFullscreen extends Fragment {
 
         Log.d("image", "image url: "+replacedString);
 
-        Picasso.with(getContext())
+        Glide.with(getContext())
                 .load(replacedString)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder)

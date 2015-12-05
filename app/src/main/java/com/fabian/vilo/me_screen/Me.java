@@ -1,24 +1,14 @@
 package com.fabian.vilo.me_screen;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,23 +21,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import android.widget.ListView;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.CustomViewPager;
+import com.fabian.vilo.MainApplication;
 import com.fabian.vilo.Settings;
 import com.fabian.vilo.Tabbar;
 import com.fabian.vilo.api.ViloApiAdapter;
 import com.fabian.vilo.api.ViloApiEndpointInterface;
-import com.fabian.vilo.custom_methods.BlurBuilder;
 import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.detail_views.QuickpostDetail;
 import com.fabian.vilo.R;
@@ -59,9 +45,9 @@ import com.fabian.vilo.models.CDModels.ModelManager;
 import com.fabian.vilo.models.FbUserAuth;
 import com.fabian.vilo.models.UpdatePosts;
 import com.fabian.vilo.models.User;
-import com.fabian.vilo.models.ViloResponse;
 import com.facebook.AccessToken;
-import com.squareup.picasso.Picasso;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;
@@ -74,6 +60,8 @@ import retrofit.Retrofit;
 public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = Me.class.getSimpleName();
+
+    private Tracker mTracker;
 
     View btnInterests;
     View btnPosts;
@@ -104,6 +92,10 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        // Obtain the shared Tracker instance.
+        MainApplication application = (MainApplication) getActivity().getApplication();
+        mTracker = application.getDefaultTracker();
 
         rootView = inflater.inflate(R.layout.activity_me, container, false);
 
@@ -290,6 +282,9 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
         if (isVisibleToUser && sharedpreferences.contains("loggedin")) {
             Log.d(TAG, "ME SCREEN APPEARED");
 
+            mTracker.setScreenName("AroundMe");
+            mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+
             if (firstViewLaunch) {
                 realm = Realm.getInstance(context);
 
@@ -301,13 +296,15 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
 
                 user = result.first();
 
+                getActivity().setTitle(result.first().getFirst_name());
+
                 ImageView profileImage = (ImageView) header.findViewById(R.id.profile);
-                Picasso.with(getContext()).load("https://graph.facebook.com/"+result.first().getFbid() + "/picture?width=500&height=500").into(profileImage);
+                Glide.with(getContext()).load(user.getUserPhoto()).into(profileImage);
 
                 firstViewLaunch = false;
             }
 
-            realm = Realm.getInstance(context);
+            /*realm = Realm.getInstance(context);
 
             // Build the query looking at all users:
             RealmQuery<CDUser> query = realm.where(CDUser.class);
@@ -315,9 +312,10 @@ public class Me extends Fragment implements SwipeRefreshLayout.OnRefreshListener
             // Execute the query:
             RealmResults<CDUser> result = query.findAll();
 
-            getActivity().setTitle(result.first().getFirst_name());
+            getActivity().setTitle(result.first().getFirst_name());*/
 
             final TextView textViewToChange = (TextView) header.findViewById(R.id.txtInterestsCount);
+            Log.d(TAG, textViewToChange.toString());
             // TODO: crasht beim ersten mal auf den Me Screen gehen nachm Login
             textViewToChange.setText(String.valueOf(getNumberOfInterestPosts()));
 

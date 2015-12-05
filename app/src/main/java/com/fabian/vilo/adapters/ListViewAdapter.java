@@ -15,15 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.api.ViloApiAdapter;
 import com.fabian.vilo.api.ViloApiEndpointInterface;
 import com.fabian.vilo.me_screen.Me;
 import com.fabian.vilo.R;
 import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.models.CDModels.CDPost;
-import com.fabian.vilo.models.User;
 import com.fabian.vilo.models.ViloResponse;
-import com.squareup.picasso.Picasso;
 
 import io.realm.Realm;
 import retrofit.Call;
@@ -195,7 +194,7 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
             if (post.getType() == 0) {
                 if (post.getImgURL().trim().length() > 0) {
                     //new ImageDownloader(viewHolder.swipeImage).execute(post.getImgURL());
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load(post.getImgURL())
                             .placeholder(R.drawable.placeholder)
                             .error(R.drawable.placeholder)
@@ -205,7 +204,7 @@ public class ListViewAdapter extends ArrayAdapter<CDPost> {
                 }
             } else if (post.getType() == 1) {
                 //new ImageDownloader(viewHolder.swipeImage).execute(post.getImgURL());
-                Picasso.with(context)
+                Glide.with(context)
                         .load(post.getImgURL())
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder)

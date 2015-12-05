@@ -24,6 +24,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.R;
 import com.fabian.vilo.Tabbar;
 import com.fabian.vilo.custom_methods.Util;
@@ -32,7 +33,6 @@ import com.fabian.vilo.detail_views.QuickpostDetail;
 import com.fabian.vilo.me_screen.Me;
 import com.fabian.vilo.models.CDModels.CDComment;
 import com.fabian.vilo.models.CDModels.CDPost;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,16 +119,24 @@ public class DetailCorePostAdapter extends ArrayAdapter<RealmObject> {
                 viewHolder.quickMainUsername.setText(post.getUsername());
                 viewHolder.quickMainTime.setText(new Util().calculateElapsedTime(post.getTimestamp()));
 
+                Glide.with(context)
+                        .load(post.getUserPhoto())
+                        .placeholder(R.drawable.placeholder)
+                        .error(R.drawable.placeholder)
+                        .centerCrop()
+                        //.fit()
+                        .into(viewHolder.quickMainUserImage);
+
                 if (post.getImgURL().trim().length() > 0) {
 
                     viewHolder.quickMainImage.setTag(post.getImgURL());
 
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load(post.getImgURL())
                             .placeholder(R.drawable.placeholder)
                             .error(R.drawable.placeholder)
                             .centerCrop()
-                            .fit()
+                            //.fit()
                             .into(viewHolder.quickMainImage);
 
                     viewHolder.quickMainImage.setOnClickListener(new View.OnClickListener() {
@@ -190,16 +198,24 @@ public class DetailCorePostAdapter extends ArrayAdapter<RealmObject> {
                 viewHolder.commentUsername.setText(comment.getUsername());
                 viewHolder.commentTime.setText(new Util().calculateElapsedTime(comment.getTimestamp()));
 
+                Glide.with(context)
+                        .load(comment.getUserPhoto())
+                        .placeholder(R.drawable.placeholder)
+                        .error(R.drawable.placeholder)
+                        .centerCrop()
+                        //.fit()
+                        .into(viewHolder.commentUserImage);
+
                 if (comment.getImgURL().trim().length() > 0) {
 
                     viewHolder.commentImage.setTag(comment.getImgURL());
 
-                    Picasso.with(context)
+                    Glide.with(context)
                             .load(comment.getImgURL())
                             .placeholder(R.drawable.placeholder)
                             .error(R.drawable.placeholder)
                             .centerCrop()
-                            .fit()
+                            //.fit()
                             .into(viewHolder.commentImage);
 
                     viewHolder.commentImage.setOnClickListener(new View.OnClickListener() {

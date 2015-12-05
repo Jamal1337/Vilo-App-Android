@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.models.Card;
 import com.fabian.vilo.R;
 import com.fabian.vilo.custom_methods.ImageDownloader;
@@ -88,21 +89,40 @@ public class CardAdapter extends ArrayAdapter<Card> {
             viewHolder.cardDistance.setText(card.distance);
             viewHolder.cardTime.setText(card.timeAgo);
 
-            /*Picasso.with(context)
+            Glide.with(context)
                     .load(card.photo)
                     .placeholder(R.drawable.placeholder)
                     .error(R.drawable.placeholder)
                     //.centerCrop()
-                    .fit()
+                    //.fit()
                     .into(viewHolder.userImage);
 
-            Picasso.with(context)
-                    .load(card.attachment)
-                    .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.placeholder)
-                    //.centerCrop()
-                    .fit()
-                    .into(viewHolder.cardImage);*/
+            if (card.type == 0) {
+                if (card.attachment != "") {
+                    Glide.with(context)
+                            .load(card.attachment)
+                            .placeholder(R.drawable.placeholder)
+                            .error(R.drawable.placeholder)
+                                    //.centerCrop()
+                            //.fit()
+                            .into(viewHolder.cardImage);
+                } else {
+                    viewHolder.cardImage.setImageResource(R.drawable.placeholder);
+                }
+
+            } else if (card.type == 1) {
+                if (card.attachment != "") {
+                    Glide.with(context)
+                            .load(card.attachment)
+                            .placeholder(R.drawable.placeholder)
+                            .error(R.drawable.placeholder)
+                                    //.centerCrop()
+                            //.fit()
+                            .into(viewHolder.cardImage);
+                } else {
+                    viewHolder.cardImage.setImageResource(R.drawable.default_event);
+                }
+            }
 
             //new ImageDownloader(viewHolder.userImage).execute(card.photo);
             //new ImageDownloader(viewHolder.cardImage).execute(card.attachment);

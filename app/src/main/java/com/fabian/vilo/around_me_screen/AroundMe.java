@@ -18,14 +18,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.CustomViewPager;
+import com.fabian.vilo.MainApplication;
 import com.fabian.vilo.Tabbar;
 import com.fabian.vilo.api.ViloApiAdapter;
 import com.fabian.vilo.api.ViloApiEndpointInterface;
 import com.fabian.vilo.adapters.CardAdapter;
 import com.fabian.vilo.adapters.CardManager;
 import com.fabian.vilo.custom_methods.GPSTracker;
-import com.fabian.vilo.custom_methods.ImageDownloader;
 import com.fabian.vilo.custom_methods.UnitLocale;
 import com.fabian.vilo.custom_methods.Util;
 import com.fabian.vilo.Login;
@@ -42,18 +43,16 @@ import com.fabian.vilo.models.FbUserAuth;
 import com.fabian.vilo.models.User;
 import com.fabian.vilo.models.ViloResponse;
 import com.facebook.AccessToken;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.skyfishjy.library.RippleBackground;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
-import com.squareup.picasso.Picasso;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.RoundingMode;
-import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import android.util.Log;
@@ -73,11 +72,14 @@ public class AroundMe extends Fragment {
 
     private static final String TAG = AroundMe.class.getSimpleName();
 
+    private Tracker mTracker;
+
     private Context context;
     private ViloApiAdapter viloAdapter;
     private ViloApiEndpointInterface apiService;
 
     private ArrayList<Card> al;
+    private ArrayList<Card> cardArrayList;
     private CardAdapter arrayAdapter;
     private int cardCounter = 0;
     private int i;
@@ -92,6 +94,8 @@ public class AroundMe extends Fragment {
 
     private int cardCount;
     private int totalPosts = 0;
+    private List<Posts.Data> data;
+
 
     private ArrayList swipedPosts = new ArrayList();
 
@@ -119,6 +123,10 @@ public class AroundMe extends Fragment {
 
         //Log.d(TAG, "loggin status: "+preferences.getInt("var1", 0));
 
+        // Obtain the shared Tracker instance.
+        MainApplication application = (MainApplication) getActivity().getApplication();
+        mTracker = application.getDefaultTracker();
+
         rootView = inflater.inflate(R.layout.activity_around_me, container, false);
 
         //locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -136,8 +144,15 @@ public class AroundMe extends Fragment {
 
         apiService = viloAdapter.mApi;
 
+        Realm realm = Realm.getInstance(context);
+        // Build the query looking at all users:
+        RealmQuery<CDUser> query = realm.where(CDUser.class);
+
+        // Execute the query:
+        RealmResults<CDUser> result = query.findAll();
+
         ImageView profileImage = (ImageView) rootView.findViewById(R.id.centerImage);
-        Picasso.with(getContext()).load("https://vilostorage.s3.amazonaws.com/profilepics/user_41444676563.png").into(profileImage);
+        Glide.with(getContext()).load(result.first().getUserPhoto()).into(profileImage);
 
         profileImage.setOnClickListener(new View.OnClickListener() {
 
@@ -150,7 +165,6 @@ public class AroundMe extends Fragment {
         });
 
         rippleBackground=(RippleBackground) rootView.findViewById(R.id.content);
-        ImageView imageView = (ImageView) rootView.findViewById(R.id.centerImage);
         searchLabel = (TextView) rootView.findViewById(R.id.searchingText);
         rippleBackground.startRippleAnimation();
 
@@ -201,14 +215,9 @@ public class AroundMe extends Fragment {
 
         setHasOptionsMenu(true);
 
-        /*Realm realm = Realm.getInstance(context);
-        // Build the query looking at all users:
-        RealmQuery<CDUser> query = realm.where(CDUser.class);
 
-        // Execute the query:
-        RealmResults<CDUser> result = query.findAll();
 
-        Log.d(TAG, "userinfo: "+result.first().getFirst_name());*/
+        /*Log.d(TAG, "userinfo: "+result.first().getFirst_name());*/
 
 
         //SharedPreferences.Editor ed;
@@ -255,6 +264,8 @@ public class AroundMe extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if (isResumed()) {
             if (isVisibleToUser && sharedpreferences.contains("loggedin") && isResumed()) {
+                mTracker.setScreenName("AroundMe");
+                mTracker.send(new HitBuilders.ScreenViewBuilder().build());
                 Log.d(TAG, "AROUND ME SCREEN APPEARED");
                 clearCards();
             } else {
@@ -383,12 +394,10 @@ public class AroundMe extends Fragment {
 
                         if (response.body().data.size() > 0) {
                             totalPosts = response.body().data.size();
+                            data = response.body().data;
                             for (int j = 0; j < totalPosts; j++) {
 
                                 CardManager cardManager = new CardManager(context);
-
-                                // TODO: Reihenfolge bleibt beim Karten erstellen nicht erhalten, da die Results unterschiedlich zurück kommen
-                                // TODO: Anzeigen das nix gefunden wurde wenn nur PhotoAlbum/Poll/Meetup zurückkommt
 
                                 switch (response.body().data.get(j).type) {
                                     case 0:
@@ -417,7 +426,12 @@ public class AroundMe extends Fragment {
 
                                                 if (cardCounter == totalPosts) {
                                                     Log.d("bla", "all cards fetched in quick at id: " + qpCard.id);
-                                                    createCards();
+                                                    if (al.size() > 0) {
+                                                        createCards();
+                                                    } else {
+                                                        rippleBackground.stopRippleAnimation();
+                                                        searchLabel.setText(R.string.no_posts_found);
+                                                    }
                                                 }
                                             }
 
@@ -452,7 +466,12 @@ public class AroundMe extends Fragment {
 
                                                 if (cardCounter == totalPosts) {
                                                     Log.d("bla", "all cards fetched in quick at id: " + qpCard.id);
-                                                    createCards();
+                                                    if (al.size() > 0) {
+                                                        createCards();
+                                                    } else {
+                                                        rippleBackground.stopRippleAnimation();
+                                                        searchLabel.setText(R.string.no_posts_found);
+                                                    }
                                                 }
                                             }
 
@@ -467,21 +486,36 @@ public class AroundMe extends Fragment {
                                         cardCounter++;
                                         if (cardCounter == totalPosts) {
                                             Log.d("bla", "all cards fetched in poll");
-                                            createCards();
+                                            if (al.size() > 0) {
+                                                createCards();
+                                            } else {
+                                                rippleBackground.stopRippleAnimation();
+                                                searchLabel.setText(R.string.no_posts_found);
+                                            }
                                         }
                                         break;
                                     case 3:
                                         cardCounter++;
                                         if (cardCounter == totalPosts) {
                                             Log.d("bla", "all cards fetched in album");
-                                            createCards();
+                                            if (al.size() > 0) {
+                                                createCards();
+                                            } else {
+                                                rippleBackground.stopRippleAnimation();
+                                                searchLabel.setText(R.string.no_posts_found);
+                                            }
                                         }
                                         break;
                                     case 4:
                                         cardCounter++;
                                         if (cardCounter == totalPosts) {
                                             Log.d("bla", "all cards fetched in meetup");
-                                            createCards();
+                                            if (al.size() > 0) {
+                                                createCards();
+                                            } else {
+                                                rippleBackground.stopRippleAnimation();
+                                                searchLabel.setText(R.string.no_posts_found);
+                                            }
                                         }
                                         break;
                                     default:
@@ -526,13 +560,32 @@ public class AroundMe extends Fragment {
         arrayAdapter.notifyDataSetChanged();
         al.addAll(hs);*/
 
-        Log.d(TAG, "number of cards:" + al.size());
+        // sortieren der gefetchten posts, da durch asynchrones laden die sortierung verloren geht
+        ArrayList<Card> sortedCards = new ArrayList<Card>();
+
+        for (int h = 0; h < data.size(); h++) {
+            if (data.get(h).type == 0 || data.get(h).type == 1) {
+                for (int k = 0; k < al.size(); k++) {
+                    if (al.get(k).postid == data.get(h).id) {
+                        sortedCards.add(al.get(k));
+                    }
+                }
+            }
+            if (h == data.size()-1) {
+                Log.d(TAG, "all items iterated");
+            }
+        }
+
+        cardArrayList = sortedCards;
+
+        Log.d(TAG, "number of cards original:" + al.size());
+        Log.d(TAG, "number of cards:" + cardArrayList.size());
 
         searchLabel.setVisibility(View.GONE);
-        cardCount = al.size();
+        cardCount = cardArrayList.size();
         getActivity().setTitle("Around Me (" + cardCount + " Posts)");
 
-        arrayAdapter = new CardAdapter(context, R.layout.item_quick, al) {
+        arrayAdapter = new CardAdapter(context, R.layout.item_quick, cardArrayList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View v = super.getView(position, convertView, parent);
@@ -542,13 +595,15 @@ public class AroundMe extends Fragment {
             }
         };
 
+        Log.d(TAG, "create cards");
+
         flingContainer.setAdapter(arrayAdapter);
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
             @Override
             public void removeFirstObjectInAdapter() {
                 // this is the simplest way to delete an object from the Adapter (/AdapterView)
                 Log.d("LIST", "removed object!");
-                al.remove(0);
+                cardArrayList.remove(0);
                 arrayAdapter.notifyDataSetChanged();
             }
 
@@ -602,10 +657,10 @@ public class AroundMe extends Fragment {
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 // Ask for more data here
                 //al.add("XML ".concat(String.valueOf(i)));
-                Log.d(TAG, "items left: " + al.size());
+                Log.d(TAG, "items left: " + cardArrayList.size());
                 arrayAdapter.notifyDataSetChanged();
 
-                if (al.size() == 0) {
+                if (cardArrayList.size() == 0) {
                     //rippleBackground.startRippleAnimation();
                     //getPosts(rootView);
                 }
@@ -803,9 +858,12 @@ public class AroundMe extends Fragment {
 
     private void clearCards() {
 
-        if (al.size() > 0) {
-            al.clear();
-            arrayAdapter.notifyDataSetChanged();
+        if (cardArrayList != null) {
+            if (cardArrayList.size() > 0) {
+                al.clear();
+                cardArrayList.clear();
+                arrayAdapter.notifyDataSetChanged();
+            }
         }
 
         getActivity().setTitle("Around Me");

@@ -34,6 +34,7 @@ public class CDUser extends RealmObject {
     private String last_name;
     private int own_push;
     private byte[] profilePicture;
+    private String userPhoto;
     private String tstamp;
     private int userid;
     private String gender;
@@ -95,6 +96,9 @@ public class CDUser extends RealmObject {
         this.birthday = birthday;
     }
 
+    public void setUserPhoto(String userPhoto) {
+        this.userPhoto = userPhoto;
+    }
 
     /**
      * Getter
@@ -152,4 +156,7 @@ public class CDUser extends RealmObject {
         return birthday;
     }
 
+    public String getUserPhoto() {
+        return userPhoto;
+    }
 }

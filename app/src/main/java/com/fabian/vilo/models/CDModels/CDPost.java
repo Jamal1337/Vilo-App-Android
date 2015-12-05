@@ -32,6 +32,7 @@ public class CDPost extends RealmObject {
     private int location_id;
     private float longitude;
     private byte[] photo;
+    private String userPhoto;
     private int radius;
     private String text;
     private String timestamp;
@@ -165,6 +166,10 @@ public class CDPost extends RealmObject {
         return poll;
     }
 
+    public String getUserPhoto() {
+        return userPhoto;
+    }
+
     /**
      * Setter
      */
@@ -283,5 +288,9 @@ public class CDPost extends RealmObject {
 
     public void setPoll(CDPoll poll) {
         this.poll = poll;
+    }
+
+    public void setUserPhoto(String userPhoto) {
+        this.userPhoto = userPhoto;
     }
 }

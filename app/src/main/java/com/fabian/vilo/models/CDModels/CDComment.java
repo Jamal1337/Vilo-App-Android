@@ -13,6 +13,7 @@ public class CDComment extends RealmObject {
     private float latitude;
     private float longitude;
     private byte[] photo;
+    private String userPhoto;
     private int postid;
     private String timestamp;
     private int type;
@@ -82,6 +83,10 @@ public class CDComment extends RealmObject {
         return post;
     }
 
+    public String getUserPhoto() {
+        return userPhoto;
+    }
+
     /**
      * Setter
      */
@@ -140,5 +145,9 @@ public class CDComment extends RealmObject {
 
     public void setPost(CDPost post) {
         this.post = post;
+    }
+
+    public void setUserPhoto(String userPhoto) {
+        this.userPhoto = userPhoto;
     }
 }

@@ -32,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
 import com.fabian.vilo.R;
 import com.fabian.vilo.Tabbar;
 import com.fabian.vilo.adapters.DetailCorePostAdapter;
@@ -55,7 +56,6 @@ import com.fabian.vilo.models.WebPostInterface;
 import com.fabian.vilo.upload_views.Quickpost;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -580,10 +580,10 @@ public class QuickpostDetail extends Fragment implements SwipeRefreshLayout.OnRe
                 photoSelected = true;
                 showPhoto.setVisibility(View.VISIBLE);
                 sendBtn.setEnabled(true);
-                Picasso.with(getContext())
+                Glide.with(getContext())
                         .load(selectedImageUri)
                         .centerCrop()
-                        .fit()
+                        //.fit()
                         .into(chosenPhoto);
 
                 showImagePicker = false;

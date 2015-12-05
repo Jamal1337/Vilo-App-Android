@@ -65,6 +65,7 @@ public class ModelManager {
         user.setPassword("");
         user.setProfilePicture(inputData);
         user.setTstamp(response.body().signup_date);
+        user.setUserPhoto(response.body().photo);
         realm.commitTransaction();
 
         return true;
@@ -146,6 +147,7 @@ public class ModelManager {
         newPost.setTimestamp(post.timestamp);
         newPost.setTopTip(post.topTip);
         newPost.setType(post.type);
+        newPost.setUserPhoto(post.photo);
 
         if ((post.type == 4 && post.location != null) || (post.type == 1)) {
             CDLocation location = realm.createObject(CDLocation.class);
@@ -214,6 +216,7 @@ public class ModelManager {
         newPost.setTimestamp(post.timestamp);
         newPost.setTopTip(post.topTip);
         newPost.setType(post.type);
+        newPost.setUserPhoto(post.photo);
 
         if (post.commentcount > 0) {
 
@@ -233,6 +236,7 @@ public class ModelManager {
                 }
                 comment.setValue(post.comments.get(i).text);
                 comment.setUsername(post.comments.get(i).username);
+                comment.setUserPhoto(post.comments.get(i).photo);
                 comment.setUserid(post.comments.get(i).userid);
                 comment.setType(0);
                 comment.setTimestamp(post.comments.get(i).timestamp);
@@ -309,6 +313,7 @@ public class ModelManager {
             }
             comment.setValue(commentsList.data.get(i).text);
             comment.setUsername(commentsList.data.get(i).username);
+            comment.setUserPhoto(commentsList.data.get(i).photo);
             comment.setUserid(commentsList.data.get(i).userid);
             comment.setType(0);
             comment.setTimestamp(commentsList.data.get(i).timestamp);
@@ -363,6 +368,7 @@ public class ModelManager {
             }
             comment.setValue(commentsList.data.get(i).text);
             comment.setUsername(commentsList.data.get(i).username);
+            comment.setUserPhoto(commentsList.data.get(i).photo);
             comment.setUserid(commentsList.data.get(i).userid);
             comment.setType(0);
             comment.setTimestamp(commentsList.data.get(i).timestamp);
@@ -436,6 +442,7 @@ public class ModelManager {
         newPost.setTimestamp(post.timestamp);
         newPost.setTopTip(post.topTip);
         newPost.setType(post.type);
+        newPost.setUserPhoto(post.photo);
 
         if (post.commentcount > 0) {
 
@@ -456,6 +463,7 @@ public class ModelManager {
 
                 comment.setValue(post.comments.get(i).text);
                 comment.setUsername(post.comments.get(i).username);
+                comment.setUserPhoto(post.comments.get(i).photo);
                 comment.setUserid(post.comments.get(i).userid);
                 comment.setType(0);
                 comment.setTimestamp(post.comments.get(i).timestamp);
@@ -540,6 +548,7 @@ public class ModelManager {
         newPost.setTimestamp(post.timestamp);
         newPost.setTopTip(post.topTip);
         newPost.setType(post.type);
+        newPost.setUserPhoto(post.photo);
 
         realm.commitTransaction();
 
@@ -584,6 +593,7 @@ public class ModelManager {
         newComment.setUserid(comment.userid);
         newComment.setUsername(comment.username);
         newComment.setValue(comment.value);
+        newComment.setUserPhoto(comment.photo);
 
         resultPost.first().setLast_updated(comment.timestamp);
 
@@ -691,6 +701,7 @@ public class ModelManager {
         newPost.setTimestamp(post.timestamp);
         newPost.setTopTip(post.topTip);
         newPost.setType(post.type);
+        newPost.setUserPhoto(post.photo);
 
 
         RealmList<CDComment> comments = new RealmList<CDComment>();
@@ -711,6 +722,7 @@ public class ModelManager {
             }
             comment.setValue(comm.value);
             comment.setUsername(comm.username);
+            comment.setUserPhoto(comm.photo);
             comment.setUserid(comm.userid);
             comment.setType(0);
             comment.setTimestamp(comm.timestamp);
@@ -776,6 +788,7 @@ public class ModelManager {
         newPost.setTimestamp(post.timestamp);
         newPost.setTopTip(post.topTip);
         newPost.setType(post.type);
+        newPost.setUserPhoto(post.photo);
 
         CDLocation location = realm.createObject(CDLocation.class);
 
@@ -814,6 +827,7 @@ public class ModelManager {
             }
             comment.setValue(comm.value);
             comment.setUsername(comm.username);
+            comment.setUserPhoto(comm.photo);
             comment.setUserid(comm.userid);
             comment.setType(0);
             comment.setTimestamp(comm.timestamp);
